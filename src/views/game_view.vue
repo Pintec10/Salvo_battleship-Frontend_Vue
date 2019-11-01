@@ -3,10 +3,10 @@
     <h1 class="text-center">Ship map</h1>
     <!--<p>gamedata: {{gamedata}}</p>
     <p>gameplayers: {{gamedata.gameplayers}}</p>-->
-    <div class="d-flex justify-space-around">
+    <div v-if="loaded" class="d-flex justify-space-around">
       <div class="d-flex flex-column align-center">
-        <h2>You: {{playerName(true)}}</h2>
-        <div class="my-3 grid" v-if="loaded">
+        <h2>You: {{playerInfo(true, "name")}}</h2>
+        <div class="my-3 grid">
           <!--first row -->
           <div class="d-flex">
             <div class="gridcell"></div>
@@ -18,13 +18,48 @@
               <div class="my-auto">{{rows[i]}}</div>
             </div>
             <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
-              <div class="gridcell bordered" :class="[cellContent(i, j)]"></div>
+              <!-- ACTUAL GAME CELL DOWN HERE -->
+              <div
+                class="gridcell bordered d-flex justify-center align-center"
+                :class="[cellContent(i, j)]"
+              >
+                <v-chip
+                  v-if="getSalvoTurn(i, j, playerInfo(false, 'ID')) !== 0"
+                  color="red"
+                  dark
+                  x-small
+                >{{getSalvoTurn(i, j, playerInfo(false, 'ID'))}}</v-chip>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="d-flex flex-column align-center">
-        <h2>Your opponent: {{playerName(false)}}</h2>
+        <h2>Your opponent: {{playerInfo(false, "name")}}</h2>
+        <div class="my-3 grid">
+          <!--first row -->
+          <div class="d-flex">
+            <div class="gridcell"></div>
+            <div v-for="(column, j) in columns" :key="j" class="gridcell text-center">{{columns[j]}}</div>
+          </div>
+          <!-- grid rows, with row names -->
+          <div v-for="(row, i) in rows" :key="i" class="d-flex gridrow">
+            <div class="gridcell d-flex align-center justify-center">
+              <div class="my-auto">{{rows[i]}}</div>
+            </div>
+            <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
+              <!-- ACTUAL GAME CELL DOWN HERE -->
+              <div class="gridcell bordered d-flex justify-center align-center" :class="'water'">
+                <v-chip
+                  v-if="getSalvoTurn(i, j, playerInfo(true, 'ID')) !== 0"
+                  color="red"
+                  dark
+                  x-small
+                >{{getSalvoTurn(i, j, playerInfo(true, 'ID'))}}</v-chip>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </v-container>
@@ -88,24 +123,51 @@ export default {
       this.gamedata.ships.forEach(item => item.location.sort());
     },
 
-    playerName(thisPlayer) {
+    playerInfo(isViewer, requestedInfo) {
       let name = "?";
       this.gamedata.gameplayers.forEach(gameplayer => {
         if (
           //for the present player
-          thisPlayer === true &&
+          isViewer === true &&
           gameplayer.id.toString() === this.$route.params.gpId.toString()
         ) {
-          name = gameplayer.player.username;
+          if (requestedInfo === "name") {
+            name = gameplayer.player.username;
+          }
+          if (requestedInfo === "ID") {
+            name = gameplayer.player.id;
+          }
         } else if (
           //for the opponent
-          thisPlayer === false &&
+          isViewer === false &&
           gameplayer.id.toString() !== this.$route.params.gpId.toString()
         ) {
-          name = gameplayer.player.username;
+          if (requestedInfo === "name") {
+            name = gameplayer.player.username;
+          }
+          if (requestedInfo === "ID") {
+            name = gameplayer.player.id;
+          }
         }
       });
       return name;
+    },
+
+    getSalvoTurn(row, col, firingPlayerID) {
+      let examinedCase = this.cellname(row, col);
+      let firingTurn = 0;
+      this.gamedata.salvoes.forEach(oneSalvo => {
+        if (
+          oneSalvo.locations.some(hitcase => hitcase === examinedCase) &&
+          oneSalvo.player === firingPlayerID
+        ) {
+          console.log("MATCH!!!");
+          firingTurn = oneSalvo.turn;
+        }
+      });
+      console.log("Examined:" + examinedCase);
+      console.log("firing turn:" + firingTurn);
+      return firingTurn;
     }
   },
 
@@ -117,6 +179,7 @@ export default {
       .then(json => {
         this.gamedata = json;
         this.shipSort();
+        console.log(this.gamedata);
         this.loaded = true;
       });
   }
@@ -145,6 +208,8 @@ export default {
 
 .water {
   background-image: url("../assets/water.jpg");
+  /*background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif");
+  background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
 
 .ship-hor-start {
