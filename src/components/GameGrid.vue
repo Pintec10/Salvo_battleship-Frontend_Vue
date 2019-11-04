@@ -16,18 +16,12 @@
           class="gridcell bordered d-flex justify-center align-center"
           :class="[cellContent(i, j)]"
         >
-          <!--<v-chip
-            v-if="getSalvoTurn(i, j, playerInfo(!isViewersGrid, 'ID')) !== 0"
-            color="red"
-            dark
-            x-small
-          >{{getSalvoTurn(i, j, playerInfo(!isViewersGrid, 'ID'))}}</v-chip>-->
           <v-chip
-            v-if="getSalvoTurn(i, j, firingPlayerID) !== 0"
+            v-if="getSalvoTurn(i, j, firingGamePlayerID) !== 0"
             color="red"
             dark
             x-small
-          >{{getSalvoTurn(i, j, firingPlayerID)}}</v-chip>
+          >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
         </div>
       </div>
     </div>
@@ -50,16 +44,12 @@ export default {
     isViewersGrid: {
       type: Boolean
     },
-    firingPlayerID: {
+    firingGamePlayerID: {
       type: Number
     }
   },
   data() {
-    return {
-      /*gamedata: {},
-      rows: [],
-      columns: []*/
-    };
+    return {};
   },
 
   methods: {
@@ -99,13 +89,14 @@ export default {
       return output;
     },
 
-    getSalvoTurn(row, col, firingPlayerID) {
+    getSalvoTurn(row, col, firingGamePlayerID) {
       let examinedCase = this.cellname(row, col);
       let firingTurn = 0;
       this.gamedata.salvoes.forEach(oneSalvo => {
         if (
           oneSalvo.locations.some(hitcase => hitcase === examinedCase) &&
-          oneSalvo.player === firingPlayerID
+          //oneSalvo.player === firingGamePlayerID
+          oneSalvo.gamePlayer === firingGamePlayerID
         ) {
           firingTurn = oneSalvo.turn;
         }

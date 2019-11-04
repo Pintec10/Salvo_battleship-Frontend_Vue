@@ -12,7 +12,7 @@
           :rows="rows"
           :columns="columns"
           :isViewersGrid="true"
-          :firingPlayerID="playerInfo(false, 'ID')"
+          :firingGamePlayerID="playerInfo(false, 'GPID')"
         />
       </div>
       <div class="d-flex flex-column align-center">
@@ -22,7 +22,7 @@
           :rows="rows"
           :columns="columns"
           :isViewersGrid="false"
-          :firingPlayerID="playerInfo(true, 'ID')"
+          :firingGamePlayerID="playerInfo(true, 'GPID')"
         />
       </div>
     </div>
@@ -54,7 +54,7 @@ export default {
     },
 
     playerInfo(isViewer, requestedInfo) {
-      let name = "?";
+      let outputInfo = "?";
       this.gamedata.gameplayers.forEach(gameplayer => {
         if (
           //for the present player
@@ -62,10 +62,10 @@ export default {
           gameplayer.id.toString() === this.$route.params.gpId.toString()
         ) {
           if (requestedInfo === "name") {
-            name = gameplayer.player.username;
+            outputInfo = gameplayer.player.username;
           }
-          if (requestedInfo === "ID") {
-            name = gameplayer.player.id;
+          if (requestedInfo === "GPID") {
+            outputInfo = gameplayer.id;
           }
         } else if (
           //for the opponent
@@ -73,14 +73,14 @@ export default {
           gameplayer.id.toString() !== this.$route.params.gpId.toString()
         ) {
           if (requestedInfo === "name") {
-            name = gameplayer.player.username;
+            outputInfo = gameplayer.player.username;
           }
-          if (requestedInfo === "ID") {
-            name = gameplayer.player.id;
+          if (requestedInfo === "GPID") {
+            outputInfo = gameplayer.id;
           }
         }
       });
-      return name;
+      return outputInfo;
     }
   },
 
