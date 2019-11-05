@@ -15,6 +15,7 @@
       </v-btn>-->
       <router-link to="/">Home</router-link>|
       <router-link to="/game_view/1">Game view 1</router-link>|
+      <router-link to="/leaderboard">Leaderboard</router-link>|
     </v-app-bar>
 
     <v-content>
