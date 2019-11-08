@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import GameView from '../views/game_view.vue'
 import Leaderboard from '../views/leaderboard.vue'
+import Login from '../views/login.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +23,11 @@ const routes = [
     path: '/leaderboard',
     name: 'leaderboard',
     component: Leaderboard
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: Login
   },
   {
     path: '/about',

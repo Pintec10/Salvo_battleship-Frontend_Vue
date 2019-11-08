@@ -3,7 +3,13 @@
     <h1 class="text-center mt-3">Leaderboard</h1>
     <v-container class="my-3">
       <div v-if="loaded === true">
-        <v-data-table :headers="headers" :items="sourcedata['scores_info']" :loading="!loaded"></v-data-table>
+        <v-data-table
+          :headers="headers"
+          :items="sourcedata['scores_info']"
+          :loading="!loaded"
+          sort-by="total_score"
+          :sort-desc="true"
+        ></v-data-table>
       </div>
     </v-container>
   </div>
@@ -36,6 +42,11 @@ export default {
         {
           text: "Games lost",
           value: "count_lost",
+          align: "center"
+        },
+        {
+          text: "Games played",
+          value: "count_played",
           align: "center"
         },
         {
