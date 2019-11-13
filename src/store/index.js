@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import router from '@/router'
 
 Vue.use(Vuex)
 
@@ -24,13 +25,17 @@ export default new Vuex.Store({
       state.loggedUser = payload;
       state.logged = true;
     },
+    logout: (state) => {
+      state.loggedUser.id = null;
+      state.loggedUser.name = null;
+      state.logged = false;
+    }
   },
 
   actions: {
     login: (context, payload) => {
       console.log("called login, sending this:");
       console.log(payload);
-      console.log(payload.username);
       var credentials = {
         username: payload.username,
         password: payload.password
@@ -54,27 +59,63 @@ export default new Vuex.Store({
         method: 'POST',
         body: getBody(credentials)
       })
-        .then((data) => {
-          console.log('Request was successful! ', data);
-          context.dispatch("fetchActiveUser");
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            return Promise.resolve(response)
+          } else { return Promise.reject(new Error(response.statusText)) }
+        })
+        //.then(response => {
+        //  context.dispatch("responseStatusCheck", response);
+        //})
+        .then((response) => {
+          console.log('Request was successful! ', response);
+          context.dispatch("fetchActiveUserContent");
+          router.push("/leaderboard");
         })
         .catch(function (error) {
           console.log('Request failure: ', error);
+          alert("Login did not succeed! " + error)
         });
     },
 
-    fetchActiveUser(context) {
-      console.log("dispatching fetchActiveUser");
+    fetchActiveUserContent(context) {
+      console.log("dispatching fetchActiveUserContent");
       fetch("/api/games")
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            return Promise.resolve(response)
+          } else { return Promise.reject(new Error(response.statusText)) }
+        })
+        //.then(response => {
+        //  context.dispatch("responseStatusCheck", response);
+        //})
         .then(response => response.json())
         .then(json => {
-          console.log("jsonized response: ");
-          console.log(json.current_user);
           context.commit("login", json.current_user);
         })
         .catch(error => {
-          console.log("Errore trying to fetch user: ", error);
+          alert("There was a problem in retrieving user data. " + error);
         })
+    },
+
+    //REMOVE IF NOT USED IN THE END
+    responseStatusCheck(response) {
+      console.log("checking status...");
+      if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+      } else {
+        console.log("it's NOT ok!");
+        return Promise.reject(new Error(response.statusText));
+      }
+    },
+
+    logout(context) {
+      fetch("/api/logout", { method: "post" })
+        .then(response => {
+          console.log("logging off");
+          console.log(response);
+          context.commit("logout");
+        });
     }
   },
 

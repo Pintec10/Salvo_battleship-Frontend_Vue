@@ -14,13 +14,15 @@
       <router-link class="mx-1" to="/">Home</router-link>
       <router-link class="mx-1" to="/game_view/1">Game view 1</router-link>
       <router-link class="mx-1" to="/leaderboard">Leaderboard</router-link>
-      <router-link class="mx-1" to="/login">Login</router-link>
+      <router-link v-if="logged === false" class="mx-1" to="/login">Login</router-link>
+      <v-btn v-else @click="logout">Logout</v-btn>
     </div>
   </v-app-bar>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import { mapActions } from "vuex";
 export default {
   name: "HeaderNav",
   data() {
@@ -29,11 +31,11 @@ export default {
     };
   },
   methods: {
-    //methods here
+    ...mapActions(["logout"])
   },
 
   computed: {
-    ...mapGetters(["loggedUser"])
+    ...mapGetters(["loggedUser", "logged"])
   }
 };
 </script>
