@@ -23,9 +23,21 @@
         class="my-3"
       />
     </div>
+    <div>
+      <v-alert
+        :value="alertPopup.visible"
+        :color="alertPopup.type"
+        dark
+        :type="alertPopup.type"
+        prominent
+        dense
+        dismissible
+        transition="scale"
+      >{{alertPopup.message}}</v-alert>
+    </div>
     <div class="my-3">
       <v-btn class="mx-3" color="green" @click="login(enteredValue)">Login</v-btn>
-      <v-btn class="mx-3" color="blue">Register</v-btn>
+      <v-btn class="mx-3" color="blue" @click="createUser(enteredValue)">Register</v-btn>
     </div>
   </div>
 </template>
@@ -45,11 +57,11 @@ export default {
   },
 
   methods: {
-    ...mapActions(["login"])
+    ...mapActions(["login", "createUser"])
   },
 
   computed: {
-    ...mapGetters(["loggedUser", "updateNavbar"])
+    ...mapGetters(["loggedUser", "updateNavbar", "alertPopup"])
   }
 };
 </script>

@@ -10,12 +10,17 @@ export default new Vuex.Store({
     loggedUser: {
       id: null,
       name: null
+    },
+    alertPopup: {
+      visible: false,
+      message: ""
     }
   },
 
   getters: {
     logged: state => { return state.logged; },
-    loggedUser: state => { return state.loggedUser; }
+    loggedUser: state => { return state.loggedUser; },
+    alertPopup: state => { return state.alertPopup }
   },
 
   mutations: {
@@ -29,13 +34,23 @@ export default new Vuex.Store({
       state.loggedUser.id = null;
       state.loggedUser.name = null;
       state.logged = false;
-    }
+    },
+    alertPopupOn: (state, payload) => {
+      state.alertPopup.visible = true;
+      state.alertPopup.type = payload.type;
+      state.alertPopup.message = payload.message;
+    },
+    alertPopupOff: (state) => {
+      state.alertPopup.visible = false;
+      setTimeout(() => {
+        state.alertPopup.message = "";
+        state.alertPopup.type = "info";
+      }, 1000);
+    },
   },
 
   actions: {
     login: (context, payload) => {
-      console.log("called login, sending this:");
-      console.log(payload);
       var credentials = {
         username: payload.username,
         password: payload.password
@@ -73,8 +88,10 @@ export default new Vuex.Store({
           router.push("/leaderboard");
         })
         .catch(function (error) {
-          console.log('Request failure: ', error);
-          alert("Login did not succeed! " + error)
+          context.commit("alertPopupOn", { type: "error", message: error })
+          setTimeout(() => {
+            context.commit("alertPopupOff");
+          }, 6000);
         });
     },
 
@@ -100,22 +117,49 @@ export default new Vuex.Store({
 
     //REMOVE IF NOT USED IN THE END
     responseStatusCheck(response) {
-      console.log("checking status...");
       if (response.status >= 200 && response.status < 300) {
         return Promise.resolve(response);
       } else {
-        console.log("it's NOT ok!");
         return Promise.reject(new Error(response.statusText));
       }
     },
 
     logout(context) {
-      fetch("/api/logout", { method: "post" })
-        .then(response => {
-          console.log("logging off");
-          console.log(response);
+      fetch("/api/logout", { method: "POST" })
+        .then(() => {
           context.commit("logout");
+          router.push("/leaderboard");
         });
+    },
+
+    createUser(context, payload) {
+      fetch("/api/players", {
+        credentials: 'include',
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: payload.username, password: payload.password })
+      })
+        .then(response => {
+          if ((response.status >= 200 && response.status < 300) || response.status === 403) {
+            return Promise.resolve(response.json());
+          } else { return Promise.reject(new Error(response.statusText)) }
+        })
+        .then(data => {
+          if ("error" in data) {
+            context.commit("alertPopupOn", { type: "error", message: data.error })
+            setTimeout(() => {
+              context.commit("alertPopupOff");
+            }, 6000);
+          } else {
+            console.log("successfully created, now proceeding to login")
+            console.log(data);
+            context.dispatch("login", payload);
+          }
+        })
+        .catch(error => {
+          console.log("error in creating user", error);
+          console.log(error);
+        })
     }
   },
 

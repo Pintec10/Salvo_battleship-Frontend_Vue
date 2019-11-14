@@ -11,11 +11,22 @@
       <span class="mr-2">Login</span>
     </v-btn>-->
     <div class="ml-3">
-      <router-link class="mx-1" to="/">Home</router-link>
-      <router-link class="mx-1" to="/game_view/1">Game view 1</router-link>
-      <router-link class="mx-1" to="/leaderboard">Leaderboard</router-link>
-      <router-link v-if="logged === false" class="mx-1" to="/login">Login</router-link>
-      <v-btn v-else @click="logout">Logout</v-btn>
+      <v-btn class="mx-1" to="/" icon>
+        <v-icon>mdi-home-flood</v-icon>
+      </v-btn>
+      <v-btn class="mx-1" to="/game_view/1" icon :disabled="!logged">
+        <v-icon>mdi-ferry</v-icon>
+      </v-btn>
+      <v-btn to="/leaderboard" icon>
+        <v-icon>mdi-trophy</v-icon>
+      </v-btn>
+
+      <v-btn v-if="logged === false" class="mx-1" to="/login" icon>
+        <v-icon>mdi-account-key</v-icon>
+      </v-btn>
+      <v-btn v-else @click="logout" icon>
+        <v-icon>mdi-exit-run</v-icon>
+      </v-btn>
     </div>
   </v-app-bar>
 </template>
