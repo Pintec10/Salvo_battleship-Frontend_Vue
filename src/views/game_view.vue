@@ -1,8 +1,6 @@
 <template>
   <v-container>
     <h1 class="text-center">Ship map</h1>
-    <!--<p>gamedata: {{gamedata}}</p>
-    <p>gameplayers: {{gamedata.gameplayers}}</p>-->
 
     <div v-if="loaded" class="d-flex justify-space-around">
       <div class="d-flex flex-column align-center">

@@ -36,8 +36,20 @@
       >{{alertPopup.message}}</v-alert>
     </div>
     <div class="my-3">
-      <v-btn class="mx-3" color="green" @click="login(enteredValue)">Login</v-btn>
-      <v-btn class="mx-3" color="blue" @click="createUser(enteredValue)">Register</v-btn>
+      <v-btn
+        class="mx-2 white--text"
+        color="green"
+        ripple
+        :disabled="enteredValue.username === '' || enteredValue.password === ''"
+        @click="login(enteredValue)"
+      >Login</v-btn>
+      <v-btn
+        class="mx-2 white--text"
+        color="blue"
+        ripple
+        :disabled="enteredValue.username === '' || enteredValue.password === ''"
+        @click="createUser(enteredValue)"
+      >Register</v-btn>
     </div>
   </div>
 </template>

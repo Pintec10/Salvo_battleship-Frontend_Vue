@@ -14,6 +14,9 @@
       <v-btn class="mx-1" to="/" icon>
         <v-icon>mdi-home-flood</v-icon>
       </v-btn>
+      <v-btn class="mx-1" to="/game_list" icon>
+        <v-icon>mdi-lighthouse-on</v-icon>
+      </v-btn>
       <v-btn class="mx-1" to="/game_view/1" icon :disabled="!logged">
         <v-icon>mdi-ferry</v-icon>
       </v-btn>

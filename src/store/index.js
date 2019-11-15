@@ -79,9 +79,6 @@ export default new Vuex.Store({
             return Promise.resolve(response)
           } else { return Promise.reject(new Error(response.statusText)) }
         })
-        //.then(response => {
-        //  context.dispatch("responseStatusCheck", response);
-        //})
         .then((response) => {
           console.log('Request was successful! ', response);
           context.dispatch("fetchActiveUserContent");
@@ -103,25 +100,16 @@ export default new Vuex.Store({
             return Promise.resolve(response)
           } else { return Promise.reject(new Error(response.statusText)) }
         })
-        //.then(response => {
-        //  context.dispatch("responseStatusCheck", response);
-        //})
         .then(response => response.json())
         .then(json => {
           context.commit("login", json.current_user);
         })
         .catch(error => {
-          alert("There was a problem in retrieving user data. " + error);
+          context.commit("alertPopupOn", { type: "error", message: error })
+          setTimeout(() => {
+            context.commit("alertPopupOff");
+          }, 6000);
         })
-    },
-
-    //REMOVE IF NOT USED IN THE END
-    responseStatusCheck(response) {
-      if (response.status >= 200 && response.status < 300) {
-        return Promise.resolve(response);
-      } else {
-        return Promise.reject(new Error(response.statusText));
-      }
     },
 
     logout(context) {
@@ -153,7 +141,11 @@ export default new Vuex.Store({
           } else {
             console.log("successfully created, now proceeding to login")
             console.log(data);
-            context.dispatch("login", payload);
+            context.commit("alertPopupOn", { type: "success", message: "Account successfully created!" })
+            setTimeout(() => {
+              context.commit("alertPopupOff");
+              context.dispatch("login", payload);
+            }, 2000);
           }
         })
         .catch(error => {
