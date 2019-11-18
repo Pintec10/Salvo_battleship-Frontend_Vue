@@ -82,7 +82,7 @@ export default new Vuex.Store({
         .then((response) => {
           console.log('Request was successful! ', response);
           context.dispatch("fetchActiveUserContent");
-          router.push("/leaderboard");
+          router.push("/game_list");
         })
         .catch(function (error) {
           context.commit("alertPopupOn", { type: "error", message: error })

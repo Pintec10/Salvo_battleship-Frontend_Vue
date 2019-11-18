@@ -14,7 +14,11 @@
           <v-btn icon v-if="!userParticipates(item) && logged && !gameIsFull(item)">
             <v-icon>mdi-feather</v-icon>
           </v-btn>
-          <v-btn icon v-if="userParticipates(item) && logged">
+          <v-btn
+            icon
+            v-if="userParticipates(item) && logged"
+            @click="continueGame(item.gameplayers)"
+          >
             <v-icon>mdi-play-pause</v-icon>
           </v-btn>
         </template>
@@ -73,6 +77,17 @@ export default {
 
     gameIsFull(oneGame) {
       return oneGame.gameplayers.length > 1;
+    },
+
+    continueGame(gameplayers) {
+      console.log("continuing game...");
+      gameplayers.forEach(gameplayer => {
+        console.log("checking gp" + gameplayer.id);
+        if (gameplayer.player.id === this.sourcedata.current_user.id) {
+          console.log("match!");
+          this.$router.push("/game_view/" + gameplayer.id);
+        }
+      });
     }
   },
 
