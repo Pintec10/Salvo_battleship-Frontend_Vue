@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="text-center">Games List</h1>
+    <h1 class="text-center">Games Dashboard</h1>
     <div class="my-3" v-if="loaded === true">
       <v-data-table
         :headers="headers"
@@ -8,7 +8,31 @@
         :loading="!loaded"
         sort-by="total_score"
         :sort-desc="true"
+        :search="search"
       >
+        <template v-slot:top>
+          <v-row class="mx-1">
+            <v-btn class="my-2 ml-2 mr-12" color="blue" dark @click="createNewGame">Create New game</v-btn>
+            <v-btn
+              outlined
+              class="ma-2"
+              color="red"
+              dark
+              v-if="logged === true"
+              @click="searchValue(sourcedata['current_user'].name)"
+            >
+              <v-icon small class="mr-1">mdi-crosshairs</v-icon>Your games
+            </v-btn>
+            <v-text-field
+              v-model="search"
+              class="ml-1 mr-3"
+              prepend-icon="mdi-magnify"
+              label="Search"
+              clearable
+            ></v-text-field>
+            <!--<v-btn class="ma-2" color="black" outlined @click="searchValue('')">Reset</v-btn>-->
+          </v-row>
+        </template>
         <template v-slot:item.action="{item}">
           <!-- WILL ADD CONDITIONS FOR ENDED GAMES!! -->
           <v-btn icon v-if="!userParticipates(item) && logged && !gameIsFull(item)">
@@ -36,6 +60,7 @@ export default {
     return {
       loaded: false,
       sourcedata: {},
+      search: "",
       headers: [
         {
           text: "Match #",
@@ -67,6 +92,10 @@ export default {
   },
 
   methods: {
+    searchValue(value) {
+      this.search = value;
+    },
+
     userParticipates(oneGame) {
       let gameplayers = oneGame.gameplayers,
         currentPlayerId = this.sourcedata["current_user"].id;
@@ -80,14 +109,28 @@ export default {
     },
 
     continueGame(gameplayers) {
-      console.log("continuing game...");
       gameplayers.forEach(gameplayer => {
-        console.log("checking gp" + gameplayer.id);
         if (gameplayer.player.id === this.sourcedata.current_user.id) {
-          console.log("match!");
           this.$router.push("/game_view/" + gameplayer.id);
         }
       });
+    },
+
+    createNewGame() {
+      console.log("creating new game...");
+      fetch("/api/games", {
+        credentials: "include",
+        method: "POST"
+      })
+        .then(response => response.json())
+        .then(json => {
+          console.log("received this");
+          console.log(json);
+          this.$router.push("/game_view/" + json.gpid);
+        })
+        .catch(error => {
+          alert("New game could not be created. ", error);
+        });
     }
   },
 
@@ -107,7 +150,9 @@ export default {
             month = d.getMonth() + 1,
             day = d.getDate(),
             hour = d.getHours(),
-            minutes = d.getMinutes();
+            minutes = d
+              .getMinutes()
+              .toLocaleString(undefined, { minimumIntegerDigits: 2 });
           element.created =
             " " + day + "/" + month + "/" + year + ", " + hour + ":" + minutes;
         });
