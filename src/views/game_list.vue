@@ -35,16 +35,33 @@
         </template>
         <template v-slot:item.action="{item}">
           <!-- WILL ADD CONDITIONS FOR ENDED GAMES!! -->
-          <v-btn icon v-if="!userParticipates(item) && logged && !gameIsFull(item)">
-            <v-icon>mdi-feather</v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            v-if="userParticipates(item) && logged"
-            @click="continueGame(item.gameplayers)"
-          >
-            <v-icon>mdi-play-pause</v-icon>
-          </v-btn>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                v-if="!userParticipates(item) && logged && !gameIsFull(item)"
+                v-on="on"
+                @click="joinExistingGame(item.id)"
+              >
+                <v-icon>mdi-feather</v-icon>
+              </v-btn>
+            </template>
+            <span>Join game</span>
+          </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                v-if="userParticipates(item) && logged"
+                @click="continueGame(item.gameplayers)"
+                v-on="on"
+              >
+                <v-icon>mdi-play-pause</v-icon>
+              </v-btn>
+            </template>
+            <span>Continue game</span>
+          </v-tooltip>
         </template>
       </v-data-table>
     </div>
@@ -73,7 +90,7 @@ export default {
           align: "center"
         },
         {
-          text: "Player 1",
+          text: "Player 2",
           value: "gameplayers[1].player.username",
           align: "center"
         },
@@ -117,19 +134,30 @@ export default {
     },
 
     createNewGame() {
-      console.log("creating new game...");
       fetch("/api/games", {
         credentials: "include",
         method: "POST"
       })
         .then(response => response.json())
         .then(json => {
-          console.log("received this");
-          console.log(json);
           this.$router.push("/game_view/" + json.gpid);
         })
         .catch(error => {
           alert("New game could not be created. ", error);
+        });
+    },
+
+    joinExistingGame(gameID) {
+      fetch("/api/game/" + gameID + "/players", {
+        credentials: "include",
+        method: "POST"
+      })
+        .then(response => response.json())
+        .then(json => {
+          this.$router.push("/game_view/" + json.gpid);
+        })
+        .catch(error => {
+          alert("Could not join game. ", error);
         });
     }
   },

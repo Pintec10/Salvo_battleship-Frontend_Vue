@@ -47,7 +47,6 @@ export default {
 
   methods: {
     shipSort() {
-      console.log("sorting ships...");
       this.gamedata.ships.forEach(item => item.location.sort());
     },
 
@@ -90,7 +89,6 @@ export default {
       .then(json => {
         this.gamedata = json;
         this.shipSort();
-        //console.log(this.gamedata);
         this.loaded = true;
       });
   }

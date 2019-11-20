@@ -25,8 +25,6 @@ export default new Vuex.Store({
 
   mutations: {
     login: (state, payload) => {
-      console.log("called mutation, sending this:");
-      console.log(payload);
       state.loggedUser = payload;
       state.logged = true;
     },
@@ -79,8 +77,7 @@ export default new Vuex.Store({
             return Promise.resolve(response)
           } else { return Promise.reject(new Error(response.statusText)) }
         })
-        .then((response) => {
-          console.log('Request was successful! ', response);
+        .then(() => {
           context.dispatch("fetchActiveUserContent");
           router.push("/game_list");
         })
@@ -93,7 +90,6 @@ export default new Vuex.Store({
     },
 
     fetchActiveUserContent(context) {
-      console.log("dispatching fetchActiveUserContent");
       fetch("/api/games")
         .then(response => {
           if (response.status >= 200 && response.status < 300) {
@@ -116,7 +112,7 @@ export default new Vuex.Store({
       fetch("/api/logout", { method: "POST" })
         .then(() => {
           context.commit("logout");
-          router.push("/leaderboard");
+          router.push("/login");
         });
     },
 
@@ -139,8 +135,6 @@ export default new Vuex.Store({
               context.commit("alertPopupOff");
             }, 6000);
           } else {
-            console.log("successfully created, now proceeding to login")
-            console.log(data);
             context.commit("alertPopupOn", { type: "success", message: "Account successfully created!" })
             setTimeout(() => {
               context.commit("alertPopupOff");
@@ -149,8 +143,7 @@ export default new Vuex.Store({
           }
         })
         .catch(error => {
-          console.log("error in creating user", error);
-          console.log(error);
+          alert("error in creating user", error);
         })
     }
   },

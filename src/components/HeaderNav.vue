@@ -5,31 +5,56 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <span class="mr-2">Welcome,</span>
-    <span v-if="loggedUser.id !== null">{{loggedUser.name}}.</span>
-    <span v-else>Guest.</span>
-    <!--<v-btn text href="https://github.com/vuetifyjs/vuetify/releases/latest" target="_blank">
-      <span class="mr-2">Login</span>
-    </v-btn>-->
+    <span v-if="loggedUser.id !== null" class="font-weight-bold blue--text">{{loggedUser.name}}</span>
+    <span v-else class="font-weight-bold blue--text">Guest</span>.
     <div class="ml-3">
-      <v-btn class="mx-1" to="/" icon>
-        <v-icon>mdi-home-flood</v-icon>
-      </v-btn>
-      <v-btn class="mx-1" to="/game_list" icon>
-        <v-icon>mdi-lighthouse-on</v-icon>
-      </v-btn>
-      <v-btn class="mx-1" to="/game_view/1" icon :disabled="!logged">
-        <v-icon>mdi-ferry</v-icon>
-      </v-btn>
-      <v-btn to="/leaderboard" icon>
-        <v-icon>mdi-trophy</v-icon>
-      </v-btn>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn class="mx-1" to="/" icon v-on="on">
+            <v-icon>mdi-home-flood</v-icon>
+          </v-btn>
+        </template>
+        <span>Home</span>
+      </v-tooltip>
 
-      <v-btn v-if="logged === false" class="mx-1" to="/login" icon>
-        <v-icon>mdi-account-key</v-icon>
-      </v-btn>
-      <v-btn v-else @click="logout" icon>
-        <v-icon>mdi-exit-run</v-icon>
-      </v-btn>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn class="mx-1" to="/game_list" icon v-on="on">
+            <v-icon>mdi-ferry</v-icon>
+          </v-btn>
+        </template>
+        <span>Games</span>
+      </v-tooltip>
+
+      <!--<v-btn class="mx-1" to="/game_view/1" icon :disabled="!logged">
+        <v-icon>mdi-ferry</v-icon>
+      </v-btn>-->
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn to="/leaderboard" icon v-on="on">
+            <v-icon>mdi-trophy</v-icon>
+          </v-btn>
+        </template>
+        <span>Leaderboard</span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn class="mx-1" to="/login" icon v-on="on" v-show="!logged">
+            <v-icon>mdi-account-key</v-icon>
+          </v-btn>
+        </template>
+        <span>Login</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{on}">
+          <v-btn @click="logout" icon v-on="on" v-show="logged">
+            <v-icon>mdi-exit-run</v-icon>
+          </v-btn>
+        </template>
+        <span>Logout</span>
+      </v-tooltip>
     </div>
   </v-app-bar>
 </template>
