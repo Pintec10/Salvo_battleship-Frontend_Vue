@@ -1,7 +1,23 @@
 <template>
   <v-container>
     <h1 class="text-center">Ship map</h1>
+    <v-btn dark @click="postPlacedShips(shipList)">SEND SHIPS</v-btn>
 
+    <!-- Popup for alerts -->
+    <div>
+      <v-alert
+        :value="alertPopup.visible"
+        :color="alertPopup.type"
+        dark
+        :type="alertPopup.type"
+        prominent
+        dense
+        dismissible
+        transition="scale"
+      >{{alertPopup.message}}</v-alert>
+    </div>
+
+    <!-- Grids -->
     <div v-if="loaded" class="d-flex justify-space-around">
       <div class="d-flex flex-column align-center">
         <h2>You: {{playerInfo(true, "name")}}</h2>
@@ -29,6 +45,7 @@
 
 <script>
 import GameGrid from "@/components/GameGrid.vue";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   name: "game_view",
@@ -41,11 +58,17 @@ export default {
       loaded: false,
       gamedata: {},
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
-      columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+      columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      shipList: [
+        { type: "Destroyer", locations: ["A1", "A2", "A3"] },
+        { type: "Patrol Boat", locations: ["I10", "J10"] }
+      ]
     };
   },
 
   methods: {
+    ...mapMutations(["alertPopupOn", "alertPopupOff"]),
+
     shipSort() {
       this.gamedata.ships.forEach(item => item.location.sort());
     },
@@ -78,19 +101,64 @@ export default {
         }
       });
       return outputInfo;
+    },
+
+    postPlacedShips(shipList) {
+      let responseState = "";
+      fetch("/api/games/players/" + this.$route.params.gpId + "/ships", {
+        credentials: "include",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(shipList)
+      })
+        .then(response => {
+          if (response.status >= 300) {
+            responseState = "error";
+          }
+          return response.text();
+        })
+        .then(respMessage => {
+          if (responseState === "error") {
+            return Promise.reject(new Error(respMessage));
+          } else {
+            this.loaded = false;
+            this.getGameData();
+          }
+        })
+        .catch(error => {
+          //alert(error);
+          this.alertPopupOn({
+            type: "error",
+            message: error
+          });
+          //context.commit("alertPopupOn", {
+          //  type: "error",
+          //  message: data.error
+          //});
+          setTimeout(() => {
+            this.alertPopupOff();
+            //context.commit("alertPopupOff");
+          }, 6000);
+        });
+    },
+
+    getGameData() {
+      fetch("/api/game_view/" + this.$route.params.gpId)
+        .then(response => response.json())
+        .then(json => {
+          this.gamedata = json;
+          this.shipSort();
+          this.loaded = true;
+        });
     }
   },
 
-  computed: {},
+  computed: {
+    ...mapGetters(["alertPopup"])
+  },
 
   created() {
-    fetch("/api/game_view/" + this.$route.params.gpId)
-      .then(response => response.json())
-      .then(json => {
-        this.gamedata = json;
-        this.shipSort();
-        this.loaded = true;
-      });
+    this.getGameData();
   }
 };
 </script>
