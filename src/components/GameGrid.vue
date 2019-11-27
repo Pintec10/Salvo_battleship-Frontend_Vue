@@ -12,12 +12,19 @@
       </div>
       <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
         <!-- ACTUAL GAME CELL DOWN HERE -->
-        <div class="gridcell cellborder d-flex justify-center align-center water">
-          <!--<v-img :src="'../src/assets/'+ cellContent(i,j) +'.jpg'" />-->
-          <!--<v-img :src="'../assets/ship-hor-end.png'" />-->
-          <v-img v-if="cellContent(i,j) !== 'water'" :src="getImageUrl(cellContent(i,j))" />
-          <!--<p>{{test}}</p>-->
-          <!--<p>{{cellContent(i,j)}}</p>-->
+        <Drop
+          @drop="handleDrop({row: row, col: column}, ...arguments)"
+          class="gridcell cellborder d-flex align-center water"
+        >
+          <v-img
+            v-if="cellContent(i,j) !== 'water' && placingShips === false"
+            :src="getImageUrl(cellContent(i,j))"
+          />
+          <!-- <div
+            v-if="cellContent(i,j) !== 'water'"
+            :style="{ backgroundImage: getImageUrl(cellContent(i,j))}"
+          ></div>-->
+
           <v-chip
             v-if="getSalvoTurn(i, j, firingGamePlayerID) !== 0"
             color="red"
@@ -25,13 +32,13 @@
             x-small
             class="absolute"
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
-        </div>
+        </Drop>
       </div>
     </div>
-    <div class="my-3">
+    <!-- <div class="my-3">
       <p>testing drop area</p>
       <drop class="dragtest ma-1 pa-5" @drop="handleDrop">dropper</drop>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -58,12 +65,13 @@ export default {
     },
     firingGamePlayerID: {
       type: Number
+    },
+    placingShips: {
+      type: Boolean
     }
   },
   data() {
-    return {
-      test: "../assets/ship-hor-end.png"
-    };
+    return {};
   },
 
   methods: {
@@ -113,7 +121,6 @@ export default {
       this.gamedata.salvoes.forEach(oneSalvo => {
         if (
           oneSalvo.locations.some(hitcase => hitcase === examinedCase) &&
-          //oneSalvo.player === firingGamePlayerID
           oneSalvo.gamePlayer === firingGamePlayerID
         ) {
           firingTurn = oneSalvo.turn;
@@ -122,8 +129,78 @@ export default {
       return firingTurn;
     },
 
-    handleDrop(data) {
-      alert("transferred in here:" + data);
+    handleDrop(arrivalCell, shipData, nativeEvent) {
+      //alert(
+      //  "dropping " + shipData.type + " at " + arrivalCell.row + arrivalCell.col
+      //);
+
+      let newShip = this.generateShip(arrivalCell, shipData);
+      let shipArray = this.gamedata.ships;
+      //removing same ship from array if already present
+      shipArray.forEach((oneShip, index) => {
+        if (oneShip.id === newShip.id) {
+          shipArray.splice(index, 1);
+        }
+      });
+
+      let conflict = false;
+      let errorMessage = ";";
+
+      //checking if overlapping with existing ship
+      newShip.location.forEach(examinedCell => {
+        shipArray.forEach(oneShip => {
+          if (
+            oneShip.location.some(existingCell => {
+              return existingCell === examinedCell;
+            })
+          ) {
+            conflict = true;
+            errorMessage = "Overlapping with existing ship!";
+          }
+        });
+
+        //let examinedCellRow = examinedCell[0];
+        let examinedCellCol = examinedCell.substring(1);
+        const outness = this.columns.some(existingCol => {
+          existingCol === examinedCellCol.toString();
+        });
+        console.log(examinedCellCol);
+        console.log(this.columns);
+        console.log(outness);
+
+        //if (
+        //  this.columns.some(existingCol => {
+        //    existingCol === examinedCellCol;
+        //  })
+        //) {
+        //  conflict = true;
+        //  errorMessage = " Trying to place the boat out of the grid!";
+        //}
+      });
+
+      //if all ok, adding the ship to the list and dropping it down
+      if (conflict === false) {
+        shipArray.push(newShip);
+        nativeEvent.target.appendChild(document.getElementById(shipData.id));
+      } else {
+        alert(errorMessage);
+      }
+    },
+
+    generateShip(arrivalCell, shipData) {
+      let newShip = {};
+      newShip.id = shipData.id;
+      newShip.type = shipData.type;
+      newShip.location = [];
+      for (let n = 0; n < shipData.size; n++) {
+        let cell = "";
+        if (shipData.orientation === "horizontal") {
+          cell += arrivalCell.row + (+arrivalCell.col + n);
+        }
+        newShip.location.push(cell);
+      }
+      console.log(newShip);
+      return newShip;
     }
   }
 };
@@ -131,27 +208,32 @@ export default {
 
 <style scoped>
 .gridcell {
-  width: 5.5vmin;
-  height: 5.5vmin;
+  width: 5vmin;
+  height: 5vmin;
   background-size: cover;
-}
-
-.grid .gridrow:not(:last-child) .cellborder {
-  background-color: teal;
+  box-sizing: border-box;
 }
 
 .cellborder {
-  border-right: 0.5px dotted white;
-  border-top: 0.5px dotted white;
+  box-shadow: 0px 0px 1.5px 0.5px hsla(0, 50%, 100%, 0.6) inset;
+  /*outline: 1px dotted white;*/
+}
+
+/*.gridrow .gridcolumn:nth-child(2) .cellborder {
+  border-left: 1px solid grey;
 }
 
 .gridrow .gridcolumn:last-child .cellborder {
-  border-right: 0.5px dotted white;
+  border-right: 1px solid grey;
+}
+
+.grid .gridrow:nth-child(2) .cellborder {
+  border-top: 1px solid grey;
 }
 
 .grid .gridrow:last-child .cellborder {
-  border-bottom: 0.5px dotted white;
-}
+  border-bottom: 1px solid grey;
+}*/
 
 .water {
   background-image: url("../assets/water.jpg");

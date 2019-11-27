@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <h1 class="text-center">Ship map</h1>
-    <v-btn dark @click="postPlacedShips(shipList)">SEND SHIPS</v-btn>
+    <!-- <v-btn dark @click="postPlacedShips(shipList)">SEND SHIPS</v-btn> -->
 
     <!-- Popup for alerts -->
     <div>
@@ -27,7 +27,9 @@
           :columns="columns"
           :isViewersGrid="true"
           :firingGamePlayerID="playerInfo(false, 'GPID')"
+          :placingShips="placingShips"
         />
+        <Fleet v-if="placingShips" :placingShips="placingShips" />
       </div>
       <div class="d-flex flex-column align-center">
         <h2>Your opponent: {{playerInfo(false, "name")}}</h2>
@@ -42,25 +44,27 @@
     </div>
 
     <!-- dragdroptest -->
-    <div class="my-3">
+    <!-- <div class="my-3">
       <p>dragdrop area</p>
-      <drag class="dragtest ma-1 pa-3" :transfer-data="test">dragger</drag>
-      <drop class="dragtest ma-1 pa-3" @drop="handleDrop">dropper</drop>
-    </div>
+      <drag id="dragbox" class="dragtest ma-1 pa-3" :transfer-data="test" drop-effect="move"></drag>
+      <drop class="dragtest-2 ma-1 pa-1" @drop="handleDrop"></drop>
+    </div>-->
   </v-container>
 </template>
 
 <script>
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
-import { Drag, Drop } from "vue-drag-drop";
+//import { Drag, Drop } from "vue-drag-drop";
+import Fleet from "@/components/Fleet.vue";
 
 export default {
   name: "game_view",
   components: {
     GameGrid,
-    Drag,
-    Drop
+    //Drag,
+    //Drop,
+    Fleet
   },
 
   data() {
@@ -69,8 +73,13 @@ export default {
       gamedata: {},
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      placingShips: true, //later set to false if needed
+      gameOn: false,
       shipList: [
-        { type: "Destroyer", locations: ["A1", "A2", "A3"] },
+        {
+          type: "Destroyer",
+          locations: ["C10", "D10", "E10", "F10", "G10", "H10"]
+        },
         { type: "Patrol Boat", locations: ["I10", "J10"] }
       ]
     };
@@ -141,13 +150,8 @@ export default {
             type: "error",
             message: error
           });
-          //context.commit("alertPopupOn", {
-          //  type: "error",
-          //  message: data.error
-          //});
           setTimeout(() => {
             this.alertPopupOff();
-            //context.commit("alertPopupOff");
           }, 6000);
         });
     },
@@ -160,11 +164,12 @@ export default {
           this.shipSort();
           this.loaded = true;
         });
-    },
+    } /*,
 
-    handleDrop(data) {
+    handleDrop(data, nativeEvent) {
+      nativeEvent.target.appendChild(document.getElementById("dragbox"));
       alert("transferred:" + data);
-    }
+    }*/
   },
 
   computed: {
@@ -187,5 +192,10 @@ export default {
   width: 5.5vmin;
   height: 5.5vmin;
   background-color: green;
+}
+.dragtest-2 {
+  width: 8vmin;
+  height: 8vmin;
+  background-color: blue;
 }
 </style>
