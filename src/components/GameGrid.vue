@@ -12,25 +12,37 @@
       </div>
       <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
         <!-- ACTUAL GAME CELL DOWN HERE -->
-        <div
-          class="gridcell bordered d-flex justify-center align-center"
-          :class="[cellContent(i, j)]"
-        >
+        <div class="gridcell cellborder d-flex justify-center align-center water">
+          <!--<v-img :src="'../src/assets/'+ cellContent(i,j) +'.jpg'" />-->
+          <!--<v-img :src="'../assets/ship-hor-end.png'" />-->
+          <v-img v-if="cellContent(i,j) !== 'water'" :src="getImageUrl(cellContent(i,j))" />
+          <!--<p>{{test}}</p>-->
+          <!--<p>{{cellContent(i,j)}}</p>-->
           <v-chip
             v-if="getSalvoTurn(i, j, firingGamePlayerID) !== 0"
             color="red"
             dark
             x-small
+            class="absolute"
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
         </div>
       </div>
+    </div>
+    <div class="my-3">
+      <p>testing drop area</p>
+      <drop class="dragtest ma-1 pa-5" @drop="handleDrop">dropper</drop>
     </div>
   </div>
 </template>
 
 <script>
+import { Drop } from "vue-drag-drop";
+
 export default {
   name: "game_grid",
+  components: {
+    Drop
+  },
   props: {
     gamedata: {
       type: Object
@@ -49,7 +61,9 @@ export default {
     }
   },
   data() {
-    return {};
+    return {
+      test: "../assets/ship-hor-end.png"
+    };
   },
 
   methods: {
@@ -89,6 +103,10 @@ export default {
       return output;
     },
 
+    getImageUrl(filename) {
+      return require("../assets/" + filename + ".png");
+    },
+
     getSalvoTurn(row, col, firingGamePlayerID) {
       let examinedCase = this.cellname(row, col);
       let firingTurn = 0;
@@ -102,6 +120,10 @@ export default {
         }
       });
       return firingTurn;
+    },
+
+    handleDrop(data) {
+      alert("transferred in here:" + data);
     }
   }
 };
@@ -109,46 +131,60 @@ export default {
 
 <style scoped>
 .gridcell {
-  width: 6vmin;
-  height: 6vmin;
+  width: 5.5vmin;
+  height: 5.5vmin;
   background-size: cover;
 }
 
-/*.bordered {
-  border-left: 1px solid black;
-  border-top: 1px solid black;
+.grid .gridrow:not(:last-child) .cellborder {
+  background-color: teal;
 }
 
-.gridrow .gridcolumn:last-child .bordered {
-  border-right: 1px solid black;
+.cellborder {
+  border-right: 0.5px dotted white;
+  border-top: 0.5px dotted white;
 }
 
-.grid .gridrow:last-child .bordered {
-  border-bottom: 1px solid black;
-}*/
+.gridrow .gridcolumn:last-child .cellborder {
+  border-right: 0.5px dotted white;
+}
+
+.grid .gridrow:last-child .cellborder {
+  border-bottom: 0.5px dotted white;
+}
 
 .water {
   background-image: url("../assets/water.jpg");
-  /*background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif");
-  background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
+  background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif");
+  /*background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
 
-.ship-hor-start {
-  background-image: url("../assets/ship-hor-start.jpg");
+/*.ship-hor-start {
+  background-image: url("../assets/ship-hor-start.png");
 }
 .ship-hor-body {
-  background-image: url("../assets/ship-hor-body.jpg");
+  background-image: url("../assets/ship-hor-body.png");
 }
 .ship-hor-end {
-  background-image: url("../assets/ship-hor-end.jpg");
+  background-image: url("../assets/ship-hor-end.png");
 }
 .ship-ver-start {
-  background-image: url("../assets/ship-ver-start.jpg");
+  background-image: url("../assets/ship-ver-start.png");
 }
 .ship-ver-body {
-  background-image: url("../assets/ship-ver-body.jpg");
+  background-image: url("../assets/ship-ver-bodypnpg");
 }
 .ship-ver-end {
-  background-image: url("../assets/ship-ver-end.jpg");
+  background-image: url("../assets/ship-ver-end.png");
+}*/
+
+.absolute {
+  position: absolute;
+}
+
+.dragtest {
+  width: 4vmin;
+  height: 4vmin;
+  background-color: blue;
 }
 </style>

@@ -40,17 +40,27 @@
         />
       </div>
     </div>
+
+    <!-- dragdroptest -->
+    <div class="my-3">
+      <p>dragdrop area</p>
+      <drag class="dragtest ma-1 pa-3" :transfer-data="test">dragger</drag>
+      <drop class="dragtest ma-1 pa-3" @drop="handleDrop">dropper</drop>
+    </div>
   </v-container>
 </template>
 
 <script>
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
+import { Drag, Drop } from "vue-drag-drop";
 
 export default {
   name: "game_view",
   components: {
-    GameGrid
+    GameGrid,
+    Drag,
+    Drop
   },
 
   data() {
@@ -150,11 +160,19 @@ export default {
           this.shipSort();
           this.loaded = true;
         });
+    },
+
+    handleDrop(data) {
+      alert("transferred:" + data);
     }
   },
 
   computed: {
-    ...mapGetters(["alertPopup"])
+    ...mapGetters(["alertPopup"]),
+
+    test() {
+      return "CIAO";
+    }
   },
 
   created() {
@@ -164,47 +182,10 @@ export default {
 </script>
 
 <style scoped>
-.gridcell {
-  width: 6vmin;
-  height: 6vmin;
-  background-size: cover;
-}
-
-/*.bordered {
-  border-left: 1px solid black;
-  border-top: 1px solid black;
-}
-
-.gridrow .gridcolumn:last-child .bordered {
-  border-right: 1px solid black;
-}
-
-.grid .gridrow:last-child .bordered {
-  border-bottom: 1px solid black;
-}*/
-
-.water {
-  background-image: url("../assets/water.jpg");
-  /*background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif");
-  background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
-}
-
-.ship-hor-start {
-  background-image: url("../assets/ship-hor-start.jpg");
-}
-.ship-hor-body {
-  background-image: url("../assets/ship-hor-body.jpg");
-}
-.ship-hor-end {
-  background-image: url("../assets/ship-hor-end.jpg");
-}
-.ship-ver-start {
-  background-image: url("../assets/ship-ver-start.jpg");
-}
-.ship-ver-body {
-  background-image: url("../assets/ship-ver-body.jpg");
-}
-.ship-ver-end {
-  background-image: url("../assets/ship-ver-end.jpg");
+/* TESTING FOR DRAGDROP */
+.dragtest {
+  width: 5.5vmin;
+  height: 5.5vmin;
+  background-color: green;
 }
 </style>

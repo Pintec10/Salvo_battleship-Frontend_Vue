@@ -14,6 +14,7 @@
       />
       <v-text-field
         v-model="enteredValue.password"
+        type="password"
         solo
         outlined
         label="email"

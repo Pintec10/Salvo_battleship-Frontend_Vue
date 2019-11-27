@@ -12,7 +12,6 @@
       >
         <template v-slot:top>
           <v-row class="mx-1">
-            <v-btn class="my-2 ml-2 mr-12" color="blue" dark @click="createNewGame">Create New game</v-btn>
             <v-btn
               outlined
               class="ma-2"
@@ -31,6 +30,7 @@
               clearable
             ></v-text-field>
             <!--<v-btn class="ma-2" color="black" outlined @click="searchValue('')">Reset</v-btn>-->
+            <v-btn class="my-2 ml-8 mr-2" color="blue" dark @click="createNewGame">Create New game</v-btn>
           </v-row>
         </template>
         <template v-slot:item.action="{item}">
