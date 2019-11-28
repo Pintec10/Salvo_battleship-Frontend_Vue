@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Fleet</p>
+    <p v-show="!dragging">Fleet</p>
     <v-row class="d-flex flex-wrap fleet-container">
       <div v-for="(ship, i) in fleetSpec" :key="i">
         <!-- <p>{{ship.type}}</p> -->
@@ -9,6 +9,9 @@
           :id="ship.id"
           :transfer-data="ship"
           :draggable="placingShips"
+          @drag="handleDragStart"
+          @dragend="handleDragEnd"
+          v-show="!dragging"
         >
           <div v-for="(cell, c) in ship.size" :key="c" class="gridcell" drop-effect="move">{{cell}}</div>
           <div slot="image" class="shipwrapper d-flex">
@@ -70,8 +73,20 @@ export default {
           placed: false,
           orientation: "horizontal"
         }
-      ]
+      ],
+      dragging: false
     };
+  },
+
+  methods: {
+    handleDragStart() {
+      console.log("this is dragstart");
+      this.dragging = true;
+    },
+    handleDragEnd() {
+      console.log("this is dragend");
+      this.dragging = false;
+    }
   }
 };
 </script>

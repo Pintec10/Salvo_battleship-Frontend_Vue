@@ -74,14 +74,14 @@ export default {
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
       placingShips: true, //later set to false if needed
-      gameOn: false,
+      gameOn: false /*,
       shipList: [
         {
           type: "Destroyer",
           locations: ["C10", "D10", "E10", "F10", "G10", "H10"]
         },
         { type: "Patrol Boat", locations: ["I10", "J10"] }
-      ]
+      ]*/
     };
   },
 

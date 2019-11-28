@@ -44,6 +44,7 @@
 
 <script>
 import { Drop } from "vue-drag-drop";
+import { mapMutations } from "vuex";
 
 export default {
   name: "game_grid",
@@ -75,6 +76,8 @@ export default {
   },
 
   methods: {
+    ...mapMutations(["alertPopupOn", "alertPopupOff"]),
+
     cellname(row, col) {
       return (this.rows[row] + this.columns[col]).toString();
     },
@@ -130,27 +133,22 @@ export default {
     },
 
     handleDrop(arrivalCell, shipData, nativeEvent) {
-      //alert(
-      //  "dropping " + shipData.type + " at " + arrivalCell.row + arrivalCell.col
-      //);
-
+      console.log("initializing handleDrop");
+      console.log("arrival cell:" + arrivalCell.row, +" " + arrivalCell.col);
       let newShip = this.generateShip(arrivalCell, shipData);
       let shipArray = this.gamedata.ships;
-      //removing same ship from array if already present
-      shipArray.forEach((oneShip, index) => {
-        if (oneShip.id === newShip.id) {
-          shipArray.splice(index, 1);
-        }
-      });
 
+      //initializing variables for illegal ship placement
       let conflict = false;
       let errorMessage = ";";
 
-      //checking if overlapping with existing ship
       newShip.location.forEach(examinedCell => {
-        shipArray.forEach(oneShip => {
+        //checking if overlapping with existing ship
+        console.log("checking for overlap");
+        shipArray.forEach(oneExistingShip => {
           if (
-            oneShip.location.some(existingCell => {
+            oneExistingShip.id !== newShip.id &&
+            oneExistingShip.location.some(existingCell => {
               return existingCell === examinedCell;
             })
           ) {
@@ -159,31 +157,41 @@ export default {
           }
         });
 
+        //checking if trying to place boat out of grid
+        console.log("checking for out of grid placement");
         //let examinedCellRow = examinedCell[0];
         let examinedCellCol = examinedCell.substring(1);
-        const outness = this.columns.some(existingCol => {
-          existingCol === examinedCellCol.toString();
+        const isInsideGrid = this.columns.some(existingCol => {
+          return existingCol == examinedCellCol;
         });
-        console.log(examinedCellCol);
-        console.log(this.columns);
-        console.log(outness);
 
-        //if (
-        //  this.columns.some(existingCol => {
-        //    existingCol === examinedCellCol;
-        //  })
-        //) {
-        //  conflict = true;
-        //  errorMessage = " Trying to place the boat out of the grid!";
-        //}
+        if (isInsideGrid === false) {
+          conflict = true;
+          errorMessage = " Trying to place the boat out of the grid!";
+        }
       });
 
       //if all ok, adding the ship to the list and dropping it down
       if (conflict === false) {
+        console.log("checks passed, pushing and appending");
+
+        //removing same ship from array if already present
+        console.log("checking if already present");
+        shipArray.forEach((oneExistingShip, index) => {
+          if (oneExistingShip.id === newShip.id) {
+            console.log("removed ship from array! " + oneExistingShip.type);
+            shipArray.splice(index, 1);
+          }
+        });
+
         shipArray.push(newShip);
         nativeEvent.target.appendChild(document.getElementById(shipData.id));
       } else {
-        alert(errorMessage);
+        console.log("checks not passed!");
+        this.alertPopupOn({ type: "error", message: errorMessage });
+        setTimeout(() => {
+          this.alertPopupOff();
+        }, 2000);
       }
     },
 

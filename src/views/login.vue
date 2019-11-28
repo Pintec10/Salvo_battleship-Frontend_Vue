@@ -74,7 +74,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["loggedUser", "updateNavbar", "alertPopup"])
+    ...mapGetters(["loggedUser", "alertPopup"])
   }
 };
 </script>
