@@ -1,21 +1,34 @@
 <template>
   <div>
-    <p v-show="!dragging">Fleet</p>
-    <v-row class="d-flex flex-wrap fleet-container">
+    <p>Fleet</p>
+    <v-row class="d-flex flex-column fleet-container justify-space-between">
+      <Drop class="my-1" @dragenter="rotateShip">
+        <v-btn>
+          <v-icon>mdi-rotate-3d-variant</v-icon>
+        </v-btn>
+      </Drop>
+
       <div v-for="(ship, i) in fleetSpec" :key="i">
-        <!-- <p>{{ship.type}}</p> -->
         <Drag
           class="shipwrapper d-flex"
           :id="ship.id"
           :transfer-data="ship"
           :draggable="placingShips"
-          @drag="handleDragStart"
+          @dragstart="handleDragStart"
           @dragend="handleDragEnd"
-          v-show="!dragging"
         >
-          <div v-for="(cell, c) in ship.size" :key="c" class="gridcell" drop-effect="move">{{cell}}</div>
-          <div slot="image" class="shipwrapper d-flex">
-            <div v-for="(cell, c) in ship.size" :key="c" class="gridcell">{{cell}}</div>
+          <div v-for="(cell, c) in ship.size" :key="c" class="gridcell" drop-effect="move">
+            <v-img :src="getImageUrl(ship.size, c)" />
+          </div>
+          <div
+            slot="image"
+            class="shipwrapper"
+            :class="{'d-flex': draggedShip.orientation === 'horizontal'}"
+          >
+            <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell">
+              <!-- <v-img :src="getImageUrl(ship.size, c)" /> -->
+              <!-- <v-img src="../assets/ship-hor-start.png" /> -->
+            </div>
           </div>
         </Drag>
       </div>
@@ -24,10 +37,10 @@
 </template>
 
 <script>
-import { Drag } from "vue-drag-drop";
+import { Drag, Drop } from "vue-drag-drop";
 export default {
   name: "fleet",
-  components: { Drag },
+  components: { Drag, Drop },
 
   props: {
     placingShips: {
@@ -37,6 +50,7 @@ export default {
 
   data() {
     return {
+      test: false, //LATER REMOVE
       fleetSpec: [
         {
           id: "ship1",
@@ -50,7 +64,7 @@ export default {
           type: "Battleship",
           size: 4,
           placed: false,
-          orientation: "horizontal"
+          orientation: "vertical"
         },
         {
           id: "ship3",
@@ -74,18 +88,47 @@ export default {
           orientation: "horizontal"
         }
       ],
-      dragging: false
+      dragging: false,
+      draggedShip: {
+        id: "",
+        type: "",
+        size: 0,
+        placed: false,
+        orientation: "horizontal"
+      }
     };
   },
 
   methods: {
-    handleDragStart() {
-      console.log("this is dragstart");
-      this.dragging = true;
+    handleDragStart(transferData) {
+      this.draggedShip = transferData;
+      setTimeout(() => {
+        document.getElementById(transferData.id).style.zIndex = "-1";
+      }, 0);
     },
-    handleDragEnd() {
-      console.log("this is dragend");
+    handleDragEnd(transferData) {
+      document.getElementById(transferData.id).style.zIndex = "0";
       this.dragging = false;
+    },
+
+    rotateShip() {
+      console.log(this.draggedShip.orientation + ", rotating...");
+      if (this.draggedShip.orientation === "horizontal") {
+        this.draggedShip.orientation = "vertical";
+      } else {
+        this.draggedShip.orientation = "horizontal";
+      }
+      console.log(this.draggedShip.orientation);
+    },
+
+    getImageUrl(shipSize, cell) {
+      if (cell === 0) {
+        return require("../assets/ship-hor-start.png");
+      } else if (cell === shipSize - 1) {
+        return require("../assets/ship-hor-end.png");
+      } else {
+        return require("../assets/ship-hor-body.png");
+      }
     }
   }
 };
@@ -93,23 +136,23 @@ export default {
 
 <style scoped>
 .fleet-container {
-  width: 50vh;
+  height: 50vh;
 }
 
 .shipwrapper {
-  border: 0.1px solid green;
+  border: 0.1px solid hsla(0, 50%, 0%, 0.5);
   z-index: 1;
-  background-color: white;
+  background-color: hsla(0, 50%, 100%, 0.5);
 }
 
 .gridcell {
-  width: 5vmin;
-  height: 5vmin;
+  width: 5.5vmin;
+  height: 5.5vmin;
   background-size: cover;
   box-sizing: border-box;
 }
 
-/*.absolute {
-  position: absolute;
-}*/
+.greenborder {
+  border: 1px solid green;
+}
 </style>

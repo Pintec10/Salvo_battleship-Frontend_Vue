@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="text-center">Ship map</h1>
+    <!--<h1 class="text-center">Ship map</h1>-->
     <!-- <v-btn dark @click="postPlacedShips(shipList)">SEND SHIPS</v-btn> -->
 
     <!-- Popup for alerts -->
@@ -21,15 +21,18 @@
     <div v-if="loaded" class="d-flex justify-space-around">
       <div class="d-flex flex-column align-center">
         <h2>You: {{playerInfo(true, "name")}}</h2>
-        <GameGrid
-          :gamedata="gamedata"
-          :rows="rows"
-          :columns="columns"
-          :isViewersGrid="true"
-          :firingGamePlayerID="playerInfo(false, 'GPID')"
-          :placingShips="placingShips"
-        />
-        <Fleet v-if="placingShips" :placingShips="placingShips" />
+
+        <div class="d-flex">
+          <Fleet v-if="placingShips" :placingShips="placingShips" class="mr-6" />
+          <GameGrid
+            :gamedata="gamedata"
+            :rows="rows"
+            :columns="columns"
+            :isViewersGrid="true"
+            :firingGamePlayerID="playerInfo(false, 'GPID')"
+            :placingShips="placingShips"
+          />
+        </div>
       </div>
       <div class="d-flex flex-column align-center">
         <h2>Your opponent: {{playerInfo(false, "name")}}</h2>

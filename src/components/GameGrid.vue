@@ -20,10 +20,6 @@
             v-if="cellContent(i,j) !== 'water' && placingShips === false"
             :src="getImageUrl(cellContent(i,j))"
           />
-          <!-- <div
-            v-if="cellContent(i,j) !== 'water'"
-            :style="{ backgroundImage: getImageUrl(cellContent(i,j))}"
-          ></div>-->
 
           <v-chip
             v-if="getSalvoTurn(i, j, firingGamePlayerID) !== 0"
@@ -133,18 +129,15 @@ export default {
     },
 
     handleDrop(arrivalCell, shipData, nativeEvent) {
-      console.log("initializing handleDrop");
-      console.log("arrival cell:" + arrivalCell.row, +" " + arrivalCell.col);
       let newShip = this.generateShip(arrivalCell, shipData);
       let shipArray = this.gamedata.ships;
 
       //initializing variables for illegal ship placement
       let conflict = false;
-      let errorMessage = ";";
+      let errorMessage = "";
 
       newShip.location.forEach(examinedCell => {
         //checking if overlapping with existing ship
-        console.log("checking for overlap");
         shipArray.forEach(oneExistingShip => {
           if (
             oneExistingShip.id !== newShip.id &&
@@ -158,12 +151,15 @@ export default {
         });
 
         //checking if trying to place boat out of grid
-        console.log("checking for out of grid placement");
-        //let examinedCellRow = examinedCell[0];
+        let examinedCellRow = examinedCell[0];
         let examinedCellCol = examinedCell.substring(1);
-        const isInsideGrid = this.columns.some(existingCol => {
-          return existingCol == examinedCellCol;
-        });
+        const isInsideGrid =
+          this.columns.some(existingCol => {
+            return existingCol == examinedCellCol;
+          }) &&
+          this.rows.some(existingRow => {
+            return existingRow == examinedCellRow;
+          });
 
         if (isInsideGrid === false) {
           conflict = true;
@@ -202,22 +198,29 @@ export default {
       newShip.location = [];
       for (let n = 0; n < shipData.size; n++) {
         let cell = "";
-        if (shipData.orientation === "horizontal") {
+        if (shipData.orientation === "vertical") {
+          cell += increaseRow(arrivalCell.row, n) + arrivalCell.col;
+        } else {
           cell += arrivalCell.row + (+arrivalCell.col + n);
         }
         newShip.location.push(cell);
       }
+      console.log("generated ship:");
       console.log(newShip);
       return newShip;
     }
   }
 };
+
+function increaseRow(rowChar, increase) {
+  return String.fromCharCode(rowChar.charCodeAt(0) + increase);
+}
 </script>
 
 <style scoped>
 .gridcell {
-  width: 5vmin;
-  height: 5vmin;
+  width: 5.5vmin;
+  height: 5.5vmin;
   background-size: cover;
   box-sizing: border-box;
 }
@@ -227,54 +230,34 @@ export default {
   /*outline: 1px dotted white;*/
 }
 
-/*.gridrow .gridcolumn:nth-child(2) .cellborder {
+/* RESTORE THESE IF YOU WANT BORDER AROUND GRID 
+.gridrow .gridcolumn:nth-child(2) .cellborder {
   border-left: 1px solid grey;
 }
-
 .gridrow .gridcolumn:last-child .cellborder {
   border-right: 1px solid grey;
 }
-
 .grid .gridrow:nth-child(2) .cellborder {
   border-top: 1px solid grey;
 }
-
 .grid .gridrow:last-child .cellborder {
   border-bottom: 1px solid grey;
 }*/
 
 .water {
   background-image: url("../assets/water.jpg");
-  background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif");
+  background-image: url("../assets/giphy_water_1.gif");
+  /* background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif"); */
   /*background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
-
-/*.ship-hor-start {
-  background-image: url("../assets/ship-hor-start.png");
-}
-.ship-hor-body {
-  background-image: url("../assets/ship-hor-body.png");
-}
-.ship-hor-end {
-  background-image: url("../assets/ship-hor-end.png");
-}
-.ship-ver-start {
-  background-image: url("../assets/ship-ver-start.png");
-}
-.ship-ver-body {
-  background-image: url("../assets/ship-ver-bodypnpg");
-}
-.ship-ver-end {
-  background-image: url("../assets/ship-ver-end.png");
-}*/
 
 .absolute {
   position: absolute;
 }
 
-.dragtest {
+/* .dragtest {
   width: 4vmin;
   height: 4vmin;
   background-color: blue;
-}
+} */
 </style>
