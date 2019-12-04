@@ -1,16 +1,11 @@
 <template>
   <div>
-    <p>Fleet</p>
+    <!-- <p>Fleet</p>
     <v-row class="d-flex flex-column fleet-container justify-space-between">
-      <Drop class="my-1" @dragenter="rotateShip">
-        <v-btn>
-          <v-icon>mdi-rotate-3d-variant</v-icon>
-        </v-btn>
-      </Drop>
-
       <div v-for="(ship, i) in fleetSpec" :key="i">
         <Drag
           class="shipwrapper d-flex"
+          :class="{'flex-column': !ship.horizontal}"
           :id="ship.id"
           :transfer-data="ship"
           :draggable="placingShips"
@@ -20,27 +15,20 @@
           <div v-for="(cell, c) in ship.size" :key="c" class="gridcell" drop-effect="move">
             <v-img :src="getImageUrl(ship.size, c)" />
           </div>
-          <div
-            slot="image"
-            class="shipwrapper"
-            :class="{'d-flex': draggedShip.orientation === 'horizontal'}"
-          >
-            <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell">
-              <!-- <v-img :src="getImageUrl(ship.size, c)" /> -->
-              <!-- <v-img src="../assets/ship-hor-start.png" /> -->
-            </div>
+          <div slot="image" class="shipwrapper" :class="{'flex-column': !ship.horizontal }">
+            <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell"></div>
           </div>
         </Drag>
       </div>
-    </v-row>
+    </v-row>-->
   </div>
 </template>
 
 <script>
-import { Drag, Drop } from "vue-drag-drop";
+import { Drag } from "vue-drag-drop";
 export default {
   name: "fleet",
-  components: { Drag, Drop },
+  components: { Drag },
 
   props: {
     placingShips: {
@@ -50,92 +38,88 @@ export default {
 
   data() {
     return {
-      test: false, //LATER REMOVE
-      fleetSpec: [
-        {
-          id: "ship1",
-          type: "Aircraft Carrier",
-          size: 5,
-          placed: false,
-          orientation: "horizontal"
-        },
-        {
-          id: "ship2",
-          type: "Battleship",
-          size: 4,
-          placed: false,
-          orientation: "vertical"
-        },
-        {
-          id: "ship3",
-          type: "Submarine",
-          size: 3,
-          placed: false,
-          orientation: "horizontal"
-        },
-        {
-          id: "ship4",
-          type: "Destroyer",
-          size: 3,
-          placed: false,
-          orientation: "horizontal"
-        },
-        {
-          id: "ship5",
-          type: "Patrol Boat",
-          size: 2,
-          placed: false,
-          orientation: "horizontal"
-        }
-      ],
-      dragging: false,
-      draggedShip: {
-        id: "",
-        type: "",
-        size: 0,
-        placed: false,
-        orientation: "horizontal"
-      }
+      //test: false, //LATER REMOVE
+      //fleetSpec: [
+      //  {
+      //    id: "ship1",
+      //    type: "Aircraft Carrier",
+      //    size: 5,
+      //    placed: false,
+      //    horizontal: true
+      //  },
+      //  {
+      //    id: "ship2",
+      //    type: "Battleship",
+      //    size: 4,
+      //    placed: false,
+      //    horizontal: true
+      //  },
+      //  {
+      //    id: "ship3",
+      //    type: "Submarine",
+      //    size: 3,
+      //    placed: false,
+      //    horizontal: true
+      //  },
+      //  {
+      //    id: "ship4",
+      //    type: "Destroyer",
+      //    size: 3,
+      //    placed: false,
+      //    horizontal: true
+      //  },
+      //  {
+      //    id: "ship5",
+      //    type: "Patrol Boat",
+      //    size: 2,
+      //    placed: false,
+      //    horizontal: true
+      //  }
+      //],
+      //dragging: false,
+      //draggedShip: {
+      //  id: "",
+      //  type: "",
+      //  size: 0,
+      //  placed: false,
+      //  horizontal: true
+      //}
     };
   },
 
   methods: {
-    handleDragStart(transferData) {
-      this.draggedShip = transferData;
-      setTimeout(() => {
-        document.getElementById(transferData.id).style.zIndex = "-1";
-      }, 0);
-    },
-    handleDragEnd(transferData) {
-      document.getElementById(transferData.id).style.zIndex = "0";
-      this.dragging = false;
-    },
-
-    rotateShip() {
-      console.log(this.draggedShip.orientation + ", rotating...");
-      if (this.draggedShip.orientation === "horizontal") {
-        this.draggedShip.orientation = "vertical";
-      } else {
-        this.draggedShip.orientation = "horizontal";
-      }
-      console.log(this.draggedShip.orientation);
-    },
-
-    getImageUrl(shipSize, cell) {
-      if (cell === 0) {
-        return require("../assets/ship-hor-start.png");
-      } else if (cell === shipSize - 1) {
-        return require("../assets/ship-hor-end.png");
-      } else {
-        return require("../assets/ship-hor-body.png");
-      }
-    }
+    //handleDragStart(transferData) {
+    //  this.draggedShip = transferData;
+    //  setTimeout(() => {
+    //    document.getElementById(transferData.shipType).style.zIndex = "-1";
+    //    document.getElementById(transferData.shipType).style.border =
+    //      "1px solid blue";
+    //  }, 0);
+    //},
+    //handleDragEnd(transferData) {
+    //  document.getElementById(transferData.shipType).style.zIndex = "0";
+    //  //this.dragging = false;
+    //},
+    //
+    //rotateShip() {
+    //  //
+    //},
+    //
+    //getImageUrl(shipSize, cell) {
+    //  if (cell === 0) {
+    //    return require("../assets/ship-hor-start.png");
+    //  } else if (cell === shipSize - 1) {
+    //    return require("../assets/ship-hor-end.png");
+    //  } else {
+    //    return require("../assets/ship-hor-body.png");
+    //  }
+    //}
   }
 };
 </script>
 
 <style scoped>
-.fleet-container {
+/*.fleet-container {
   height: 50vh;
 }
 
@@ -154,5 +138,5 @@ export default {
 
 .greenborder {
   border: 1px solid green;
-}
+}*/
 </style>

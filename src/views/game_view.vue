@@ -23,7 +23,7 @@
         <h2>You: {{playerInfo(true, "name")}}</h2>
 
         <div class="d-flex">
-          <Fleet v-if="placingShips" :placingShips="placingShips" class="mr-6" />
+          <!-- <Fleet v-if="placingShips" :placingShips="placingShips" class="mr-6" /> -->
           <GameGrid
             :gamedata="gamedata"
             :rows="rows"
@@ -31,6 +31,7 @@
             :isViewersGrid="true"
             :firingGamePlayerID="playerInfo(false, 'GPID')"
             :placingShips="placingShips"
+            :loaded="loaded"
           />
         </div>
       </div>
@@ -59,15 +60,15 @@
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
 //import { Drag, Drop } from "vue-drag-drop";
-import Fleet from "@/components/Fleet.vue";
+//import Fleet from "@/components/Fleet.vue";
 
 export default {
   name: "game_view",
   components: {
-    GameGrid,
+    GameGrid //,
     //Drag,
     //Drop,
-    Fleet
+    //Fleet
   },
 
   data() {
@@ -77,14 +78,29 @@ export default {
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
       placingShips: true, //later set to false if needed
-      gameOn: false /*,
-      shipList: [
+      gameOn: false,
+      defaultShipList: [
+        {
+          type: "Aircraft Carrier",
+          location: ["A1", "A2", "A3", "A4", "A5"]
+        },
+        {
+          type: "Battleship",
+          location: ["C3", "C4", "C5", "C6"]
+        },
+        {
+          type: "Submarine",
+          location: ["E5", "E6", "E7"]
+        },
         {
           type: "Destroyer",
-          locations: ["C10", "D10", "E10", "F10", "G10", "H10"]
+          location: ["G7", "G8", "G9"]
         },
-        { type: "Patrol Boat", locations: ["I10", "J10"] }
-      ]*/
+        {
+          type: "Patrol Boat",
+          location: ["I9", "I10"]
+        }
+      ]
     };
   },
 
@@ -92,7 +108,19 @@ export default {
     ...mapMutations(["alertPopupOn", "alertPopupOff"]),
 
     shipSort() {
-      this.gamedata.ships.forEach(item => item.location.sort());
+      this.gamedata.ships.forEach(item =>
+        item.location.sort(function(cell1, cell2) {
+          let cell1Comp = cell1;
+          let cell2Comp = cell2;
+          if (cell1Comp.length === 2) {
+            cell1Comp = cell1Comp[0] + "0" + cell1Comp[1];
+          }
+          if (cell2Comp.length === 2) {
+            cell2Comp = cell2Comp[0] + "0" + cell2Comp[1];
+          }
+          return cell1Comp - cell2Comp;
+        })
+      );
     },
 
     playerInfo(isViewer, requestedInfo) {
@@ -164,6 +192,9 @@ export default {
         .then(response => response.json())
         .then(json => {
           this.gamedata = json;
+          if (this.gamedata.ships.length === 0) {
+            this.gamedata.ships = this.defaultShipList;
+          }
           this.shipSort();
           this.loaded = true;
         });
@@ -176,11 +207,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["alertPopup"]),
-
-    test() {
-      return "CIAO";
-    }
+    ...mapGetters(["alertPopup"])
   },
 
   created() {

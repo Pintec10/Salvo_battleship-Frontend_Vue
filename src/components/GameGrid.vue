@@ -12,39 +12,60 @@
       </div>
       <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
         <!-- ACTUAL GAME CELL DOWN HERE -->
+
         <Drop
           @drop="handleDrop({row: row, col: column}, ...arguments)"
           class="gridcell cellborder d-flex align-center water"
         >
-          <v-img
-            v-if="cellContent(i,j) !== 'water' && placingShips === false"
-            :src="getImageUrl(cellContent(i,j))"
-          />
+          <Drag
+            v-if="cellContent(i,j).isShipStart"
+            :id="cellContent(i,j).shipType"
+            class="d-flex align-self-start shipwrapper"
+            :class="{'flex-column': !cellContent(i,j).isHorizontal}"
+            :transfer-data="cellContent(i,j)"
+            :draggable="placingShips"
+            @dragstart="handleDragStart"
+          >
+            <div
+              v-for="(cell, c) in cellContent(i,j).shipLength"
+              :key="c"
+              class="gridcell"
+              :class="{'flex-column': !cellContent(i,j).isHorizontal}"
+              drop-effect="move"
+            >
+              <v-img
+                :src="getImageUrl(c, cellContent(i,j).shipLength, cellContent(i,j).isHorizontal)"
+              />
+            </div>
+
+            <!-- <div slot="image" class="shipwrapper" :class="{'flex-column': !ship.horizontal }">
+                  <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell">
+                    <v-img src="../assets/ship-hor-start.png" />
+                  </div>
+            </div>-->
+          </Drag>
 
           <v-chip
             v-if="getSalvoTurn(i, j, firingGamePlayerID) !== 0"
             color="red"
             dark
             x-small
-            class="absolute"
+            class="absolute on-top"
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
         </Drop>
       </div>
     </div>
-    <!-- <div class="my-3">
-      <p>testing drop area</p>
-      <drop class="dragtest ma-1 pa-5" @drop="handleDrop">dropper</drop>
-    </div>-->
   </div>
 </template>
 
 <script>
-import { Drop } from "vue-drag-drop";
+import { Drag, Drop } from "vue-drag-drop";
 import { mapMutations } from "vuex";
 
 export default {
   name: "game_grid",
   components: {
+    Drag,
     Drop
   },
   props: {
@@ -65,10 +86,15 @@ export default {
     },
     placingShips: {
       type: Boolean
+    },
+    loaded: {
+      type: Boolean
     }
   },
   data() {
-    return {};
+    return {
+      //dragOngoing: false
+    };
   },
 
   methods: {
@@ -80,29 +106,27 @@ export default {
 
     cellContent(row, col) {
       let examinedCase = this.cellname(row, col);
-      let output = "water";
+      let output = {
+        isShip: false,
+        isHorizontal: false,
+        isShipStart: false,
+        shipLength: null,
+        shipType: null
+      };
       for (let ship in this.gamedata.ships) {
         let locationArray = this.gamedata.ships[ship].location;
         locationArray.forEach((locItem, locIndex) => {
           if (locItem === examinedCase && this.isViewersGrid === true) {
             //there is a ship
-            output = "ship";
+            output.isShip = true;
+            output.shipType = this.gamedata.ships[ship].type;
             if (locationArray[0][0] === locationArray[1][0]) {
               //horizontal ship
-              output += "-hor";
-            } else {
-              //vertical ship
-              output += "-ver";
+              output.isHorizontal = true;
             }
-            switch (locIndex) {
-              case 0:
-                output += "-start"; //first ship tile
-                break;
-              case locationArray.length - 1:
-                output += "-end"; //last ship tile
-                break;
-              default:
-                output += "-body"; //middle ship tile
+            if (locItem === examinedCase && locIndex === 0) {
+              output.isShipStart = true;
+              output.shipLength = locationArray.length;
             }
           }
         });
@@ -110,8 +134,24 @@ export default {
       return output;
     },
 
-    getImageUrl(filename) {
-      return require("../assets/" + filename + ".png");
+    getImageUrl(cellPosition, shipLength, shipIsHorizontal) {
+      let outputUrl = "ship-";
+      if (shipIsHorizontal) {
+        outputUrl += "hor-";
+      } else {
+        outputUrl += "ver-";
+      }
+      switch (cellPosition) {
+        case 0:
+          outputUrl += "start"; //first ship tile
+          break;
+        case shipLength - 1:
+          outputUrl += "end"; //last ship tile
+          break;
+        default:
+          outputUrl += "body"; //middle ship tile
+      }
+      return require("../assets/" + outputUrl + ".png");
     },
 
     getSalvoTurn(row, col, firingGamePlayerID) {
@@ -128,7 +168,7 @@ export default {
       return firingTurn;
     },
 
-    handleDrop(arrivalCell, shipData, nativeEvent) {
+    handleDrop(arrivalCell, shipData) {
       let newShip = this.generateShip(arrivalCell, shipData);
       let shipArray = this.gamedata.ships;
 
@@ -140,7 +180,7 @@ export default {
         //checking if overlapping with existing ship
         shipArray.forEach(oneExistingShip => {
           if (
-            oneExistingShip.id !== newShip.id &&
+            oneExistingShip.type !== newShip.type &&
             oneExistingShip.location.some(existingCell => {
               return existingCell === examinedCell;
             })
@@ -172,16 +212,13 @@ export default {
         console.log("checks passed, pushing and appending");
 
         //removing same ship from array if already present
-        console.log("checking if already present");
         shipArray.forEach((oneExistingShip, index) => {
-          if (oneExistingShip.id === newShip.id) {
-            console.log("removed ship from array! " + oneExistingShip.type);
+          if (oneExistingShip.type === newShip.type) {
             shipArray.splice(index, 1);
           }
         });
 
         shipArray.push(newShip);
-        nativeEvent.target.appendChild(document.getElementById(shipData.id));
       } else {
         console.log("checks not passed!");
         this.alertPopupOn({ type: "error", message: errorMessage });
@@ -189,32 +226,47 @@ export default {
           this.alertPopupOff();
         }, 2000);
       }
+
+      //making the Drag element visible again (was hidden at dragStart)
+      document.getElementById(shipData.shipType).style.zIndex = "0";
     },
 
     generateShip(arrivalCell, shipData) {
       let newShip = {};
-      newShip.id = shipData.id;
-      newShip.type = shipData.type;
+
+      newShip.type = shipData.shipType;
       newShip.location = [];
-      for (let n = 0; n < shipData.size; n++) {
+      for (let n = 0; n < shipData.shipLength; n++) {
         let cell = "";
-        if (shipData.orientation === "vertical") {
-          cell += increaseRow(arrivalCell.row, n) + arrivalCell.col;
+        if (shipData.isHorizontal === false) {
+          cell += this.increaseRow(arrivalCell.row, n) + arrivalCell.col;
         } else {
           cell += arrivalCell.row + (+arrivalCell.col + n);
         }
         newShip.location.push(cell);
       }
-      console.log("generated ship:");
-      console.log(newShip);
+
       return newShip;
-    }
+    },
+
+    increaseRow(rowChar, increase) {
+      return String.fromCharCode(rowChar.charCodeAt(0) + increase);
+    },
+
+    handleDragStart(transferData) {
+      setTimeout(() => {
+        document.getElementById(transferData.shipType).style.zIndex = "-1";
+      }, 0);
+    } //,
+
+    //handleDragEnd(transferData) {
+    //  console.log("ending drag");
+    //  console.log(transferData);
+    //  document.getElementById(transferData.shipType).style.zIndex = "0";
+    //  //this.dragOngoing = false;
+    //}
   }
 };
-
-function increaseRow(rowChar, increase) {
-  return String.fromCharCode(rowChar.charCodeAt(0) + increase);
-}
 </script>
 
 <style scoped>
@@ -251,13 +303,17 @@ function increaseRow(rowChar, increase) {
   /*background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
 
+.shipwrapper {
+  border: 0.1px solid hsla(0, 50%, 0%, 0.5);
+  z-index: 1;
+  background-color: hsla(0, 50%, 100%, 0.4);
+}
+
 .absolute {
   position: absolute;
 }
 
-/* .dragtest {
-  width: 4vmin;
-  height: 4vmin;
-  background-color: blue;
-} */
+.on-top {
+  z-index: 1;
+}
 </style>
