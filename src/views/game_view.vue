@@ -4,7 +4,7 @@
     <!-- <v-btn dark @click="postPlacedShips(shipList)">SEND SHIPS</v-btn> -->
 
     <!-- Popup for alerts -->
-    <div>
+    <div class="d-flex justify-center">
       <v-alert
         :value="alertPopup.visible"
         :color="alertPopup.type"
@@ -14,6 +14,7 @@
         dense
         dismissible
         transition="scale"
+        class="absolute"
       >{{alertPopup.message}}</v-alert>
     </div>
 
@@ -218,14 +219,7 @@ export default {
 
 <style scoped>
 /* TESTING FOR DRAGDROP */
-.dragtest {
-  width: 5.5vmin;
-  height: 5.5vmin;
-  background-color: green;
-}
-.dragtest-2 {
-  width: 8vmin;
-  height: 8vmin;
-  background-color: blue;
+.absolute {
+  position: absolute;
 }
 </style>

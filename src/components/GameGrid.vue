@@ -25,6 +25,7 @@
             :transfer-data="cellContent(i,j)"
             :draggable="placingShips"
             @dragstart="handleDragStart"
+            @dragend="handleDragEnd"
           >
             <div
               v-for="(cell, c) in cellContent(i,j).shipLength"
@@ -37,6 +38,25 @@
                 :src="getImageUrl(c, cellContent(i,j).shipLength, cellContent(i,j).isHorizontal)"
               />
             </div>
+            <div
+              slot="image"
+              class="shipwrapper d-flex"
+              :class="{'flex-column': !cellContent(i,j).isHorizontal}"
+            >
+              <div v-for="(cell, c) in cellContent(i,j).shipLength" :key="c" class="gridcell"></div>
+            </div>
+
+            <v-btn
+              fab
+              dark
+              color="deep-orange accent-3"
+              height="4vmin"
+              width="4vmin"
+              class="rotate-button"
+              @click="rotateShip(row, column, cellContent(i,j))"
+            >
+              <v-icon class="rotate-icon" size="3vmin">mdi-rotate-3d-variant</v-icon>
+            </v-btn>
 
             <!-- <div slot="image" class="shipwrapper" :class="{'flex-column': !ship.horizontal }">
                   <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell">
@@ -226,9 +246,6 @@ export default {
           this.alertPopupOff();
         }, 2000);
       }
-
-      //making the Drag element visible again (was hidden at dragStart)
-      document.getElementById(shipData.shipType).style.zIndex = "0";
     },
 
     generateShip(arrivalCell, shipData) {
@@ -257,14 +274,18 @@ export default {
       setTimeout(() => {
         document.getElementById(transferData.shipType).style.zIndex = "-1";
       }, 0);
-    } //,
+    },
 
-    //handleDragEnd(transferData) {
-    //  console.log("ending drag");
-    //  console.log(transferData);
-    //  document.getElementById(transferData.shipType).style.zIndex = "0";
-    //  //this.dragOngoing = false;
-    //}
+    rotateShip(row, column, shipData) {
+      shipData.isHorizontal = !shipData.isHorizontal;
+      this.handleDrop({ row: row, col: column }, shipData);
+    },
+
+    handleDragEnd(transferData) {
+      console.log("ending drag");
+      console.log(transferData);
+      document.getElementById(transferData.shipType).style.zIndex = "0";
+    }
   }
 };
 </script>
@@ -307,6 +328,7 @@ export default {
   border: 0.1px solid hsla(0, 50%, 0%, 0.5);
   z-index: 1;
   background-color: hsla(0, 50%, 100%, 0.4);
+  position: relative;
 }
 
 .absolute {
@@ -315,5 +337,18 @@ export default {
 
 .on-top {
   z-index: 1;
+}
+
+.rotate-button {
+  position: absolute;
+  top: -1vmin;
+  left: -1vmin;
+  height: 3.5vmin;
+  width: 3.5vmin;
+}
+
+.rotate-icon {
+  height: 1vmin !important;
+  width: 1vmin !important;
 }
 </style>
