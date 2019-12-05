@@ -47,6 +47,7 @@
             </div>
 
             <v-btn
+              v-if="placingShips"
               fab
               dark
               color="deep-orange accent-3"
@@ -118,7 +119,11 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["alertPopupOn", "alertPopupOff"]),
+    ...mapMutations([
+      "alertPopupOn",
+      "alertPopupOff",
+      "updateShipPlacementList"
+    ]),
 
     cellname(row, col) {
       return (this.rows[row] + this.columns[col]).toString();
@@ -239,6 +244,7 @@ export default {
         });
 
         shipArray.push(newShip);
+        this.updateShipPlacementList(shipArray);
       } else {
         console.log("checks not passed!");
         this.alertPopupOn({ type: "error", message: errorMessage });
@@ -282,8 +288,6 @@ export default {
     },
 
     handleDragEnd(transferData) {
-      console.log("ending drag");
-      console.log(transferData);
       document.getElementById(transferData.shipType).style.zIndex = "0";
     }
   }
@@ -291,6 +295,11 @@ export default {
 </script>
 
 <style scoped>
+.grid {
+  user-select: none;
+  /* necessary to fix a factory bug of the "draggable" prop of "Drag" elements*/
+}
+
 .gridcell {
   width: 5.5vmin;
   height: 5.5vmin;
@@ -351,4 +360,8 @@ export default {
   height: 1vmin !important;
   width: 1vmin !important;
 }
+
+/*.highlightable :hover {
+  border: 1px solid gold;
+}*/
 </style>

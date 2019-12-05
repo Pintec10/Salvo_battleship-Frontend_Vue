@@ -17,7 +17,7 @@
               class="ma-2"
               color="red"
               dark
-              v-if="logged === true"
+              v-if="logged"
               @click="searchValue(sourcedata['current_user'].name)"
             >
               <v-icon small class="mr-1">mdi-crosshairs</v-icon>Your games
@@ -30,7 +30,13 @@
               clearable
             ></v-text-field>
             <!--<v-btn class="ma-2" color="black" outlined @click="searchValue('')">Reset</v-btn>-->
-            <v-btn class="my-2 ml-8 mr-2" color="blue" dark @click="createNewGame">Create New game</v-btn>
+            <v-btn
+              :disabled="!logged"
+              class="my-2 ml-8 mr-2"
+              color="blue"
+              :dark="logged"
+              @click="createNewGame"
+            >Create New game</v-btn>
           </v-row>
         </template>
         <template v-slot:item.action="{item}">

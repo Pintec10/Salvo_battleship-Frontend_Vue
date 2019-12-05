@@ -18,7 +18,7 @@
       >{{alertPopup.message}}</v-alert>
     </div>
 
-    <!-- Grids -->
+    <!-- Viewer's grid area -->
     <div v-if="loaded" class="d-flex justify-space-around">
       <div class="d-flex flex-column align-center">
         <h2>You: {{playerInfo(true, "name")}}</h2>
@@ -35,7 +35,17 @@
             :loaded="loaded"
           />
         </div>
+        <v-btn
+          :dark="shipPlacementList.length === 5"
+          v-if="placingShips"
+          :disabled="shipPlacementList.length !== 5"
+          color="deep-orange accent-3"
+          class="mt-5"
+          @click="postPlacedShips(shipPlacementList)"
+        >READY TO GO!</v-btn>
       </div>
+
+      <!-- Opponent's grid area -->
       <div class="d-flex flex-column align-center">
         <h2>Your opponent: {{playerInfo(false, "name")}}</h2>
         <GameGrid
@@ -66,10 +76,7 @@ import { mapGetters, mapMutations } from "vuex";
 export default {
   name: "game_view",
   components: {
-    GameGrid //,
-    //Drag,
-    //Drop,
-    //Fleet
+    GameGrid
   },
 
   data() {
@@ -78,7 +85,7 @@ export default {
       gamedata: {},
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-      placingShips: true, //later set to false if needed
+      placingShips: false, //later set to false if needed
       gameOn: false,
       defaultShipList: [
         {
@@ -101,12 +108,30 @@ export default {
           type: "Patrol Boat",
           location: ["I9", "I10"]
         }
+      ],
+      fakeShipList: [
+        {
+          type: "Destroyer",
+          locations: ["A1", "A2", "A3"]
+        },
+        {
+          type: "Patrol Boat",
+          locations: ["I10", "J10"]
+        },
+        {
+          type: "Petrol Boat",
+          locations: ["E9", "F9"]
+        }
       ]
     };
   },
 
   methods: {
-    ...mapMutations(["alertPopupOn", "alertPopupOff"]),
+    ...mapMutations([
+      "alertPopupOn",
+      "alertPopupOff",
+      "updateShipPlacementList"
+    ]),
 
     shipSort() {
       this.gamedata.ships.forEach(item =>
@@ -173,11 +198,11 @@ export default {
             return Promise.reject(new Error(respMessage));
           } else {
             this.loaded = false;
+            this.placingShips = false;
             this.getGameData();
           }
         })
         .catch(error => {
-          //alert(error);
           this.alertPopupOn({
             type: "error",
             message: error
@@ -193,8 +218,11 @@ export default {
         .then(response => response.json())
         .then(json => {
           this.gamedata = json;
+          console.log("received this json shipList:");
+          console.log(json);
           if (this.gamedata.ships.length === 0) {
-            this.gamedata.ships = this.defaultShipList;
+            this.gamedata.ships = [...this.defaultShipList];
+            this.placingShips = true;
           }
           this.shipSort();
           this.loaded = true;
@@ -208,17 +236,17 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["alertPopup"])
+    ...mapGetters(["alertPopup", "shipPlacementList"])
   },
 
   created() {
     this.getGameData();
+    this.updateShipPlacementList([]);
   }
 };
 </script>
 
 <style scoped>
-/* TESTING FOR DRAGDROP */
 .absolute {
   position: absolute;
 }

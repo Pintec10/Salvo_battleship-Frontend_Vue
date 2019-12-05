@@ -14,13 +14,15 @@ export default new Vuex.Store({
     alertPopup: {
       visible: false,
       message: ""
-    }
+    },
+    shipPlacementList: []
   },
 
   getters: {
     logged: state => { return state.logged; },
     loggedUser: state => { return state.loggedUser; },
-    alertPopup: state => { return state.alertPopup }
+    alertPopup: state => { return state.alertPopup },
+    shipPlacementList: state => { return state.shipPlacementList }
   },
 
   mutations: {
@@ -45,6 +47,9 @@ export default new Vuex.Store({
         state.alertPopup.type = "info";
       }, 1000);
     },
+    updateShipPlacementList: (state, payload) => {
+      state.shipPlacementList = payload;
+    }
   },
 
   actions: {
