@@ -43,7 +43,12 @@
               class="shipwrapper d-flex"
               :class="{'flex-column': !cellContent(i,j).isHorizontal}"
             >
-              <div v-for="(cell, c) in cellContent(i,j).shipLength" :key="c" class="gridcell"></div>
+              <div v-for="(cell, c) in cellContent(i,j).shipLength" :key="c" class="gridcell">
+                <v-img
+                  :src="getImageUrl(c, cellContent(i,j).shipLength, cellContent(i,j).isHorizontal)"
+                />
+                <!-- check why is image not displaying or displays only on first drag!! -->
+              </div>
             </div>
 
             <v-btn
@@ -73,6 +78,14 @@
             x-small
             class="absolute on-top"
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
+          <!--clickable div to submit Salvo-->
+          <div
+            v-else-if="firingSalvoes"
+            @click="updateSalvoPlacementList(cellname(i, j))"
+            class="gridcell d-flex justify-center align-center"
+          >
+            <v-icon v-if="onSalvoPlacementList(cellname(i, j))" color="black">mdi-bomb</v-icon>
+          </div>
         </Drop>
       </div>
     </div>
@@ -82,6 +95,7 @@
 <script>
 import { Drag, Drop } from "vue-drag-drop";
 import { mapMutations } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "game_grid",
@@ -108,6 +122,9 @@ export default {
     placingShips: {
       type: Boolean
     },
+    firingSalvoes: {
+      type: Boolean
+    },
     loaded: {
       type: Boolean
     }
@@ -122,7 +139,8 @@ export default {
     ...mapMutations([
       "alertPopupOn",
       "alertPopupOff",
-      "updateShipPlacementList"
+      "updateShipPlacementList",
+      "updateSalvoPlacementList"
     ]),
 
     cellname(row, col) {
@@ -289,7 +307,17 @@ export default {
 
     handleDragEnd(transferData) {
       document.getElementById(transferData.shipType).style.zIndex = "0";
+    },
+
+    onSalvoPlacementList(evaluatedCell) {
+      return this.salvoPlacementList.some(
+        alreadySelectedCell => alreadySelectedCell === evaluatedCell
+      );
     }
+  },
+
+  computed: {
+    ...mapGetters(["salvoPlacementList"])
   }
 };
 </script>
@@ -364,4 +392,8 @@ export default {
 /*.highlightable :hover {
   border: 1px solid gold;
 }*/
+
+.test {
+  border: 2px solid blue;
+}
 </style>

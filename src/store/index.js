@@ -15,14 +15,16 @@ export default new Vuex.Store({
       visible: false,
       message: ""
     },
-    shipPlacementList: []
+    shipPlacementList: [],
+    salvoPlacementList: []
   },
 
   getters: {
     logged: state => { return state.logged; },
     loggedUser: state => { return state.loggedUser; },
     alertPopup: state => { return state.alertPopup },
-    shipPlacementList: state => { return state.shipPlacementList }
+    shipPlacementList: state => { return state.shipPlacementList },
+    salvoPlacementList: state => { return state.salvoPlacementList }
   },
 
   mutations: {
@@ -49,6 +51,18 @@ export default new Vuex.Store({
     },
     updateShipPlacementList: (state, payload) => {
       state.shipPlacementList = payload;
+    },
+    updateSalvoPlacementList: (state, payload) => {
+      let salvoList = state.salvoPlacementList;
+      if (salvoList.some(oneCell => oneCell === payload)) {
+        salvoList.splice(salvoList.indexOf(payload), 1)
+      } else {
+        let itemsToRemove = 0;
+        if (salvoList.length > 4) {
+          itemsToRemove = salvoList.length - 4;
+        }
+        salvoList.splice(0, itemsToRemove, payload);
+      }
     }
   },
 

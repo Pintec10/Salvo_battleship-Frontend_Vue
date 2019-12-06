@@ -24,7 +24,6 @@
         <h2>You: {{playerInfo(true, "name")}}</h2>
 
         <div class="d-flex">
-          <!-- <Fleet v-if="placingShips" :placingShips="placingShips" class="mr-6" /> -->
           <GameGrid
             :gamedata="gamedata"
             :rows="rows"
@@ -33,6 +32,7 @@
             :firingGamePlayerID="playerInfo(false, 'GPID')"
             :placingShips="placingShips"
             :loaded="loaded"
+            :firingSalvoes="false"
           />
         </div>
         <v-btn
@@ -54,6 +54,9 @@
           :columns="columns"
           :isViewersGrid="false"
           :firingGamePlayerID="playerInfo(true, 'GPID')"
+          :placingShips="false"
+          :loaded="loaded"
+          :firingSalvoes="firingSalvoes"
         />
       </div>
     </div>
@@ -85,8 +88,9 @@ export default {
       gamedata: {},
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-      placingShips: false, //later set to false if needed
-      gameOn: false,
+      placingShips: false,
+      gameOn: false, //check in the end if it is actually needed!
+      firingSalvoes: true, //later set to false
       defaultShipList: [
         {
           type: "Aircraft Carrier",
@@ -107,20 +111,6 @@ export default {
         {
           type: "Patrol Boat",
           location: ["I9", "I10"]
-        }
-      ],
-      fakeShipList: [
-        {
-          type: "Destroyer",
-          locations: ["A1", "A2", "A3"]
-        },
-        {
-          type: "Patrol Boat",
-          locations: ["I10", "J10"]
-        },
-        {
-          type: "Petrol Boat",
-          locations: ["E9", "F9"]
         }
       ]
     };
