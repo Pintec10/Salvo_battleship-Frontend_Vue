@@ -78,13 +78,14 @@
             x-small
             class="absolute on-top"
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
-          <!--clickable div to submit Salvo-->
+          <!--clickable div to submit a shot-->
           <div
             v-else-if="firingSalvoes"
             @click="updateSalvoPlacementList(cellname(i, j))"
             class="gridcell d-flex justify-center align-center"
+            :class="{targeted: onSalvoPlacementList(cellname(i, j))}"
           >
-            <v-icon v-if="onSalvoPlacementList(cellname(i, j))" color="black">mdi-bomb</v-icon>
+            <v-icon v-if="onSalvoPlacementList(cellname(i, j))" color="white">mdi-target</v-icon>
           </div>
         </Drop>
       </div>
@@ -387,6 +388,11 @@ export default {
 .rotate-icon {
   height: 1vmin !important;
   width: 1vmin !important;
+}
+
+.targeted {
+  /* background-color: hsla(0, 49%, 40%, 0.7);*/
+  box-shadow: 0px 0px 4vmin 0px rgba(221, 16, 16, 0.8) inset;
 }
 
 /*.highlightable :hover {

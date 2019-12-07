@@ -55,13 +55,17 @@ export default new Vuex.Store({
     updateSalvoPlacementList: (state, payload) => {
       let salvoList = state.salvoPlacementList;
       if (salvoList.some(oneCell => oneCell === payload)) {
-        salvoList.splice(salvoList.indexOf(payload), 1)
+        document.getElementById("cancel").play();
+        salvoList.splice(salvoList.indexOf(payload), 1);
+      } else if (payload === "reset") {
+        salvoList.splice(0, salvoList.length);
       } else {
         let itemsToRemove = 0;
         if (salvoList.length > 4) {
           itemsToRemove = salvoList.length - 4;
         }
         salvoList.splice(0, itemsToRemove, payload);
+        document.getElementById("target").play();
       }
     }
   },

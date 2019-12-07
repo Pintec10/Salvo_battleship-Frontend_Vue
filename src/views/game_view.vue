@@ -58,6 +58,23 @@
           :loaded="loaded"
           :firingSalvoes="firingSalvoes"
         />
+        <v-btn
+          :dark="salvoPlacementList.length === 5"
+          v-if="firingSalvoes"
+          :disabled="salvoPlacementList.length !== 5"
+          color="red darken-2"
+          class="mt-5"
+          @click="postPlacedSalvoes(salvoPlacementList)"
+        >FIRE!</v-btn>
+        <audio id="target">
+          <source src="../assets/sounds/bleep02.wav" />
+        </audio>
+        <audio id="cancel">
+          <source src="../assets/sounds/cancel02.wav" />
+        </audio>
+        <audio id="launch">
+          <source src="../assets/sounds/launch04.wav" />
+        </audio>
       </div>
     </div>
 
@@ -120,7 +137,8 @@ export default {
     ...mapMutations([
       "alertPopupOn",
       "alertPopupOff",
-      "updateShipPlacementList"
+      "updateShipPlacementList",
+      "updateSalvoPlacementList"
     ]),
 
     shipSort() {
@@ -141,6 +159,9 @@ export default {
 
     playerInfo(isViewer, requestedInfo) {
       let outputInfo = "?";
+      if (requestedInfo === "GPID") {
+        outputInfo = 0;
+      }
       this.gamedata.gameplayers.forEach(gameplayer => {
         if (
           //for the present player
@@ -208,30 +229,65 @@ export default {
         .then(response => response.json())
         .then(json => {
           this.gamedata = json;
-          console.log("received this json shipList:");
-          console.log(json);
           if (this.gamedata.ships.length === 0) {
             this.gamedata.ships = [...this.defaultShipList];
             this.placingShips = true;
+          } else {
+            this.updateSalvoPlacementList("reset");
+            this.firingSalvoes = true;
           }
           this.shipSort();
           this.loaded = true;
         });
-    } /*,
+    },
 
-    handleDrop(data, nativeEvent) {
-      nativeEvent.target.appendChild(document.getElementById("dragbox"));
-      alert("transferred:" + data);
-    }*/
+    postPlacedSalvoes(targetLocationsList) {
+      //document.getElementById("launch").play();
+      let responseState = "";
+      let salvo = {};
+      salvo.locations = targetLocationsList;
+      fetch("/api/games/players/" + this.$route.params.gpId + "/salvoes", {
+        credentials: "include",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(salvo)
+      })
+        .then(response => {
+          if (response.status >= 300) {
+            responseState = "error";
+          }
+          return response.text();
+        })
+        .then(respMessage => {
+          if (responseState === "error") {
+            return Promise.reject(new Error(respMessage));
+          } else {
+            //document.getElementById("launch").play();
+            this.loaded = false;
+            this.firingSalvoes = false;
+            this.getGameData();
+          }
+        })
+        .catch(error => {
+          this.alertPopupOn({
+            type: "error",
+            message: error
+          });
+          setTimeout(() => {
+            this.alertPopupOff();
+          }, 6000);
+        });
+    }
   },
 
   computed: {
-    ...mapGetters(["alertPopup", "shipPlacementList"])
+    ...mapGetters(["alertPopup", "shipPlacementList", "salvoPlacementList"])
   },
 
   created() {
     this.getGameData();
     this.updateShipPlacementList([]);
+    this.updateSalvoPlacementList("reset");
   }
 };
 </script>
