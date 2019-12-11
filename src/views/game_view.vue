@@ -1,8 +1,5 @@
 <template>
   <v-container>
-    <!--<h1 class="text-center">Ship map</h1>-->
-    <!-- <v-btn dark @click="postPlacedShips(shipList)">SEND SHIPS</v-btn> -->
-
     <!-- Popup for alerts -->
     <div class="d-flex justify-center">
       <v-alert
@@ -18,54 +15,82 @@
       >{{alertPopup.message}}</v-alert>
     </div>
 
-    <!-- Viewer's grid area -->
-    <div v-if="loaded" class="d-flex justify-space-around">
-      <div class="d-flex flex-column align-center">
-        <h2>You: {{playerInfo(true, "name")}}</h2>
+    <div v-if="loaded" class="d-flex justify-space-around mt-3">
+      <!-- Viewer's grid area -->
+      <div class="d-flex flex-column align-center mr-5">
+        <h2 class="mb-2">You: {{playerInfo(true, "name")}}</h2>
 
-        <div class="d-flex">
-          <GameGrid
-            :gamedata="gamedata"
-            :rows="rows"
-            :columns="columns"
-            :isViewersGrid="true"
-            :firingGamePlayerID="playerInfo(false, 'GPID')"
-            :placingShips="placingShips"
-            :loaded="loaded"
-            :firingSalvoes="false"
-          />
+        <div class="d-flex justify-space-around">
+          <div class="mr-3">
+            <Fleet
+              :isViewersFleet="true"
+              :fleetData="gamedata.ships"
+              :viewerGPid="$route.params.gpId"
+              :battleStatus="gamedata.battleStatus"
+              :fleetStatus="selectFleetStatus(true)"
+            />
+          </div>
+          <div class="d-flex flex-column align-center">
+            <GameGrid
+              :gamedata="gamedata"
+              :rows="rows"
+              :columns="columns"
+              :isViewersGrid="true"
+              :firingGamePlayerID="playerInfo(false, 'GPID')"
+              :placingShips="placingShips"
+              :loaded="loaded"
+              :firingSalvoes="false"
+            />
+            <v-btn
+              :dark="shipPlacementList.length === 5"
+              v-if="placingShips"
+              :disabled="shipPlacementList.length !== 5"
+              color="deep-orange accent-3"
+              class="mt-5"
+              @click="postPlacedShips(shipPlacementList)"
+            >READY TO GO!</v-btn>
+          </div>
         </div>
-        <v-btn
-          :dark="shipPlacementList.length === 5"
-          v-if="placingShips"
-          :disabled="shipPlacementList.length !== 5"
-          color="deep-orange accent-3"
-          class="mt-5"
-          @click="postPlacedShips(shipPlacementList)"
-        >READY TO GO!</v-btn>
       </div>
 
       <!-- Opponent's grid area -->
-      <div class="d-flex flex-column align-center">
-        <h2>Your opponent: {{playerInfo(false, "name")}}</h2>
-        <GameGrid
-          :gamedata="gamedata"
-          :rows="rows"
-          :columns="columns"
-          :isViewersGrid="false"
-          :firingGamePlayerID="playerInfo(true, 'GPID')"
-          :placingShips="false"
-          :loaded="loaded"
-          :firingSalvoes="firingSalvoes"
-        />
-        <v-btn
-          :dark="salvoPlacementList.length === 5"
-          v-if="firingSalvoes"
-          :disabled="salvoPlacementList.length !== 5"
-          color="red darken-2"
-          class="mt-5"
-          @click="postPlacedSalvoes(salvoPlacementList)"
-        >FIRE!</v-btn>
+      <div class="d-flex flex-column align-center ml-5">
+        <h2 class="mb-2">Your opponent: {{playerInfo(false, "name")}}</h2>
+
+        <div class="d-flex justify-space-between">
+          <div class="d-flex flex-column align-center">
+            <GameGrid
+              :gamedata="gamedata"
+              :rows="rows"
+              :columns="columns"
+              :isViewersGrid="false"
+              :firingGamePlayerID="playerInfo(true, 'GPID')"
+              :placingShips="false"
+              :loaded="loaded"
+              :firingSalvoes="firingSalvoes"
+            />
+            <v-btn
+              :dark="salvoPlacementList.length === 5"
+              v-if="firingSalvoes"
+              :disabled="salvoPlacementList.length !== 5"
+              color="red darken-2"
+              class="mt-5"
+              @click="postPlacedSalvoes(salvoPlacementList)"
+            >
+              <v-icon class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
+            </v-btn>
+          </div>
+          <div class="ml-4">
+            <Fleet
+              :isViewersFleet="false"
+              :fleetData="gamedata.ships"
+              :viewerGPid="this.$route.params.gpId"
+              :battleStatus="gamedata.battleStatus"
+              :fleetStatus="selectFleetStatus(false)"
+            />
+          </div>
+        </div>
+
         <audio id="target">
           <source src="../assets/sounds/bleep02.wav" />
         </audio>
@@ -91,12 +116,13 @@
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
 //import { Drag, Drop } from "vue-drag-drop";
-//import Fleet from "@/components/Fleet.vue";
+import Fleet from "@/components/Fleet.vue";
 
 export default {
   name: "game_view",
   components: {
-    GameGrid
+    GameGrid,
+    Fleet
   },
 
   data() {
@@ -277,6 +303,21 @@ export default {
             this.alertPopupOff();
           }, 6000);
         });
+    },
+
+    selectFleetStatus(isViewersFleet) {
+      let selectedReport;
+      let viewersId = this.$route.params.gpId;
+
+      this.gamedata.battleStatus.forEach(oneReport => {
+        if (
+          (isViewersFleet && oneReport.gamePlayer == viewersId) ||
+          (!isViewersFleet && oneReport.gamePlayer != viewersId)
+        ) {
+          selectedReport = Object.assign({}, oneReport);
+        }
+      });
+      return selectedReport.fleetStatus;
     }
   },
 
@@ -293,7 +334,11 @@ export default {
 </script>
 
 <style scoped>
-.absolute {
+/*.absolute {
   position: absolute;
+}*/
+
+.test {
+  border: 1px solid red;
 }
 </style>

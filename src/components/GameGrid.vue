@@ -1,5 +1,5 @@
 <template>
-  <div class="my-3 grid">
+  <div class="mb-3 grid">
     <!--first row -->
     <div class="d-flex">
       <div class="gridcell"></div>
@@ -73,10 +73,10 @@
 
           <v-chip
             v-if="getSalvoTurn(i, j, firingGamePlayerID) !== 0"
-            color="red"
             dark
             x-small
-            class="absolute on-top"
+            class="absolute on-top darken-2"
+            :class="{'red': isAHit(cellname(i,j))}"
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
           <!--clickable div to submit a shot-->
           <div
@@ -131,9 +131,7 @@ export default {
     }
   },
   data() {
-    return {
-      //dragOngoing: false
-    };
+    return {};
   },
 
   methods: {
@@ -314,6 +312,18 @@ export default {
       return this.salvoPlacementList.some(
         alreadySelectedCell => alreadySelectedCell === evaluatedCell
       );
+    },
+
+    isAHit(evaluatedCell) {
+      let answer = false;
+      this.gamedata.battleStatus.forEach(oneStatus => {
+        if (oneStatus.gamePlayer != this.firingGamePlayerID) {
+          answer = oneStatus.hitsReceived.some(
+            hitCell => hitCell === evaluatedCell
+          );
+        }
+      });
+      return answer;
     }
   },
 
@@ -391,15 +401,10 @@ export default {
 }
 
 .targeted {
-  /* background-color: hsla(0, 49%, 40%, 0.7);*/
   box-shadow: 0px 0px 4vmin 0px rgba(221, 16, 16, 0.8) inset;
 }
 
 /*.highlightable :hover {
   border: 1px solid gold;
 }*/
-
-.test {
-  border: 2px solid blue;
-}
 </style>

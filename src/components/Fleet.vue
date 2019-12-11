@@ -1,125 +1,90 @@
 <template>
   <div>
-    <!-- <p>Fleet</p>
-    <v-row class="d-flex flex-column fleet-container justify-space-between">
-      <div v-for="(ship, i) in fleetSpec" :key="i">
-        <Drag
-          class="shipwrapper d-flex"
-          :class="{'flex-column': !ship.horizontal}"
-          :id="ship.id"
-          :transfer-data="ship"
-          :draggable="placingShips"
-          @dragstart="handleDragStart"
-          @dragend="handleDragEnd"
-        >
-          <div v-for="(cell, c) in ship.size" :key="c" class="gridcell" drop-effect="move">
-            <v-img :src="getImageUrl(ship.size, c)" />
+    <div class="my-2 text-center">
+      <h3 class="ma-0 font-weight-bold">Fleet Status</h3>
+      <p>{{fleetStatus.gameplayer}}</p>
+    </div>
+    <div
+      class="d-flex flex-column fleet-container"
+      :class="{'align-start': isViewersFleet, 'align-end': !isViewersFleet}"
+    >
+      <div
+        v-for="(ship, i) in fleetStatus"
+        :key="i"
+        class="shipwrapper relative d-flex mx-1 my-2"
+        :id="'fleet-' + ship.type"
+      >
+        <!-- <div
+        v-for="(ship, i) in fleetData"
+        :key="i"
+        class="shipwrapper relative d-flex mx-1 my-2"
+        :id="'fleet-' + ship.type"
+        >-->
+        <div v-for="(cell, c) in ship.maxHP" :key="c" class="gridcell">
+          <v-img :src="getImageUrl(ship.maxHP, c)" />
+        </div>
+        <div class="absolute d-flex">
+          <div v-for="(cell, c) in ship.totalDamage" :key="c" class="gridcell hit-box">
+            <v-icon color="red darken-2" size="5.5vmin">mdi-fire</v-icon>
           </div>
-          <div slot="image" class="shipwrapper" :class="{'flex-column': !ship.horizontal }">
-            <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell"></div>
-          </div>
-        </Drag>
+        </div>
+        <!-- </div> -->
       </div>
-    </v-row>-->
+    </div>
   </div>
 </template>
 
 <script>
-import { Drag } from "vue-drag-drop";
 export default {
   name: "fleet",
-  components: { Drag },
+  components: {},
 
   props: {
-    placingShips: {
+    isViewersFleet: {
       type: Boolean
+    },
+    viewerGPid: {
+      type: String
+    },
+    fleetData: {
+      type: Array
+    },
+    battleStatus: {
+      type: Array
+    },
+    fleetStatus: {
+      type: Object
     }
   },
 
   data() {
-    return {
-      //test: false, //LATER REMOVE
-      //fleetSpec: [
-      //  {
-      //    id: "ship1",
-      //    type: "Aircraft Carrier",
-      //    size: 5,
-      //    placed: false,
-      //    horizontal: true
-      //  },
-      //  {
-      //    id: "ship2",
-      //    type: "Battleship",
-      //    size: 4,
-      //    placed: false,
-      //    horizontal: true
-      //  },
-      //  {
-      //    id: "ship3",
-      //    type: "Submarine",
-      //    size: 3,
-      //    placed: false,
-      //    horizontal: true
-      //  },
-      //  {
-      //    id: "ship4",
-      //    type: "Destroyer",
-      //    size: 3,
-      //    placed: false,
-      //    horizontal: true
-      //  },
-      //  {
-      //    id: "ship5",
-      //    type: "Patrol Boat",
-      //    size: 2,
-      //    placed: false,
-      //    horizontal: true
-      //  }
-      //],
-      //dragging: false,
-      //draggedShip: {
-      //  id: "",
-      //  type: "",
-      //  size: 0,
-      //  placed: false,
-      //  horizontal: true
-      //}
-    };
+    return {};
   },
 
   methods: {
-    //handleDragStart(transferData) {
-    //  this.draggedShip = transferData;
-    //  setTimeout(() => {
-    //    document.getElementById(transferData.shipType).style.zIndex = "-1";
-    //    document.getElementById(transferData.shipType).style.border =
-    //      "1px solid blue";
-    //  }, 0);
-    //},
-    //handleDragEnd(transferData) {
-    //  document.getElementById(transferData.shipType).style.zIndex = "0";
-    //  //this.dragging = false;
-    //},
-    //
-    //rotateShip() {
-    //  //
-    //},
-    //
-    //getImageUrl(shipSize, cell) {
-    //  if (cell === 0) {
-    //    return require("../assets/ship-hor-start.png");
-    //  } else if (cell === shipSize - 1) {
-    //    return require("../assets/ship-hor-end.png");
-    //  } else {
-    //    return require("../assets/ship-hor-body.png");
-    //  }
-    //}
+    getImageUrl(shipSize, cell) {
+      if (cell === 0) {
+        return require("../assets/ship-hor-start.png");
+      } else if (cell === shipSize - 1) {
+        return require("../assets/ship-hor-end.png");
+      } else {
+        return require("../assets/ship-hor-body.png");
+      }
+    },
+
+    sufferedDamage() {
+      this.gamedata.battleStatus.forEach(oneStatus => {
+        if (oneStatus.gamePlayer != this.firingGamePlayerID) {
+          //
+        }
+      });
+    }
   }
 };
 </script>
 
 <style scoped>
-/*.fleet-container {
+.fleet-container {
   height: 50vh;
 }
 
@@ -132,11 +97,23 @@ export default {
 .gridcell {
   width: 5.5vmin;
   height: 5.5vmin;
-  background-size: cover;
   box-sizing: border-box;
 }
 
-.greenborder {
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+  top: 0;
+}
+
+.hit-box {
+  background-color: hsla(0, 50%, 90%, 0.6);
+}
+
+.test2 {
   border: 1px solid green;
-}*/
+}
 </style>
