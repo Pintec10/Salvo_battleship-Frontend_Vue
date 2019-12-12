@@ -21,7 +21,7 @@
         <h2 class="mb-2">You: {{playerInfo(true, "name")}}</h2>
 
         <div class="d-flex justify-space-around">
-          <div class="mr-3">
+          <div class="mr-5">
             <Fleet
               :isViewersFleet="true"
               :fleetData="gamedata.ships"
@@ -80,7 +80,7 @@
               <v-icon class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
             </v-btn>
           </div>
-          <div class="ml-4">
+          <div class="ml-5">
             <Fleet
               :isViewersFleet="false"
               :fleetData="gamedata.ships"
@@ -155,7 +155,13 @@ export default {
           type: "Patrol Boat",
           location: ["I9", "I10"]
         }
-      ]
+      ],
+      defaultStatusReport: {
+        gamePlayer: 27,
+        hitsReceived: null,
+        missReceived: null,
+        fleetStatus: []
+      }
     };
   },
 
@@ -306,7 +312,7 @@ export default {
     },
 
     selectFleetStatus(isViewersFleet) {
-      let selectedReport;
+      let selectedReport = null;
       let viewersId = this.$route.params.gpId;
 
       this.gamedata.battleStatus.forEach(oneReport => {
@@ -314,9 +320,15 @@ export default {
           (isViewersFleet && oneReport.gamePlayer == viewersId) ||
           (!isViewersFleet && oneReport.gamePlayer != viewersId)
         ) {
+          console.log("assign!" + oneReport.gamePlayer);
           selectedReport = Object.assign({}, oneReport);
         }
       });
+      console.log(selectedReport);
+      if (selectedReport === null) {
+        selectedReport = this.defaultStatusReport;
+      }
+
       return selectedReport.fleetStatus;
     }
   },
