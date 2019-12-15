@@ -28,6 +28,7 @@
               :viewerGPid="$route.params.gpId"
               :battleStatus="gamedata.battleStatus"
               :fleetStatus="selectFleetStatus(true)"
+              :updatingFleet="updatingFleet"
             />
           </div>
           <div class="d-flex flex-column align-center">
@@ -70,14 +71,19 @@
               :firingSalvoes="firingSalvoes"
             />
             <v-btn
-              :dark="salvoPlacementList.length === 5"
-              v-if="firingSalvoes"
-              :disabled="salvoPlacementList.length !== 5"
+              :dark="salvoPlacementList.length === 5 && gamedata.setupComplete"
+              v-if="!placingShips"
+              :disabled="salvoPlacementList.length !== 5 || !firingSalvoes || !gamedata.setupComplete"
               color="red darken-2"
               class="mt-5"
               @click="postPlacedSalvoes(salvoPlacementList)"
             >
-              <v-icon class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
+              <div v-if="!firingSalvoes || !gamedata.setupComplete">
+                <v-icon class="mr-1">mdi-timer-sand</v-icon>Waiting...
+              </div>
+              <div v-else>
+                <v-icon class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
+              </div>
             </v-btn>
           </div>
           <div class="ml-5">
@@ -87,6 +93,7 @@
               :viewerGPid="this.$route.params.gpId"
               :battleStatus="gamedata.battleStatus"
               :fleetStatus="selectFleetStatus(false)"
+              :updatingFleet="updatingFleet"
             />
           </div>
         </div>
@@ -128,12 +135,14 @@ export default {
   data() {
     return {
       loaded: false,
+      dataUpdater: null,
       gamedata: {},
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
       placingShips: false,
       gameOn: false, //check in the end if it is actually needed!
-      firingSalvoes: true, //later set to false
+      firingSalvoes: false,
+      updatingFleet: false,
       defaultShipList: [
         {
           type: "Aircraft Carrier",
@@ -242,6 +251,7 @@ export default {
           } else {
             this.loaded = false;
             this.placingShips = false;
+            this.updateSalvoPlacementList("reset");
             this.getGameData();
           }
         })
@@ -257,16 +267,21 @@ export default {
     },
 
     getGameData() {
+      console.log("calling getgamedata");
       fetch("/api/game_view/" + this.$route.params.gpId)
         .then(response => response.json())
         .then(json => {
+          this.updatingFleet = true;
           this.gamedata = json;
           if (this.gamedata.ships.length === 0) {
             this.gamedata.ships = [...this.defaultShipList];
             this.placingShips = true;
           } else {
-            this.updateSalvoPlacementList("reset");
-            this.firingSalvoes = true;
+            this.updateFiringSalvoesStatus();
+          }
+          //if setupComplete true, update placingSalvoes
+          if (this.gamedata.ships.length !== 0) {
+            this.updateFiringSalvoesStatus();
           }
           this.shipSort();
           this.loaded = true;
@@ -297,6 +312,7 @@ export default {
             //document.getElementById("launch").play();
             this.loaded = false;
             this.firingSalvoes = false;
+            this.updateSalvoPlacementList("reset");
             this.getGameData();
           }
         })
@@ -320,16 +336,46 @@ export default {
           (isViewersFleet && oneReport.gamePlayer == viewersId) ||
           (!isViewersFleet && oneReport.gamePlayer != viewersId)
         ) {
-          console.log("assign!" + oneReport.gamePlayer);
-          selectedReport = Object.assign({}, oneReport);
+          //selectedReport = Object.assign({}, oneReport);
+          selectedReport = { ...oneReport };
         }
       });
-      console.log(selectedReport);
+
       if (selectedReport === null) {
         selectedReport = this.defaultStatusReport;
       }
 
+      let fleet = selectedReport.fleetStatus;
+      if (fleet.length > 1) {
+        console.log("trying to organize ships");
+        for (let i = 0; i < fleet.length - 1; i++) {
+          for (let j = i + 1; j < fleet.length; j++) {
+            if (
+              fleet[i].maxHP <= fleet[j].maxHP ||
+              (fleet[i].maxHP === fleet[j].maxHP &&
+                fleet[i].type === "Submarine")
+            ) {
+              let temp = { ...fleet[i] };
+              fleet[i] = { ...fleet[j] };
+              fleet[j] = { ...temp };
+            }
+          }
+        }
+      }
+      this.updatingFleet = false;
       return selectedReport.fleetStatus;
+    },
+
+    updateFiringSalvoesStatus() {
+      if (!this.gamedata.setupComplete) {
+        this.firingSalvoes = false;
+      } else {
+        this.firingSalvoes = !this.gamedata.salvoes.some(
+          oneSalvo =>
+            oneSalvo.turn == this.gamedata.currentTurn &&
+            oneSalvo.gamePlayer == this.$route.params.gpId
+        );
+      }
     }
   },
 
@@ -341,14 +387,23 @@ export default {
     this.getGameData();
     this.updateShipPlacementList([]);
     this.updateSalvoPlacementList("reset");
+    this.dataUpdater = setInterval(() => {
+      if (!this.placingShips) {
+        this.getGameData();
+      }
+    }, 5000);
+
+    //  function startAnnoying() {
+    //timerId = setInterval(function() { console.log("hi"); }, 1000);
+    //}
   }
 };
 </script>
 
 <style scoped>
-/*.absolute {
+.absolute {
   position: absolute;
-}*/
+}
 
 .test {
   border: 1px solid red;

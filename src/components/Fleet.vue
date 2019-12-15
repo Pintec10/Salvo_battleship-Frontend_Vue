@@ -14,6 +14,7 @@
       :class="{'align-start': isViewersFleet, 'align-end': !isViewersFleet}"
     >
       <div
+        v-show="!updatingFleet"
         v-for="(ship, i) in fleetStatus"
         :key="i"
         class="shipwrapper relative d-flex mx-1 my-2 water"
@@ -56,12 +57,12 @@ export default {
     viewerGPid: {
       type: String
     },
-    /*fleetData: {
-      type: Array
-    },
+    updatingFleet: {
+      type: Boolean
+    } /*
     battleStatus: {
       type: Array
-    },*/
+    },*/,
     fleetStatus: {
       type: Array
     }
@@ -86,6 +87,20 @@ export default {
       this.gamedata.battleStatus.forEach(oneStatus => {
         if (oneStatus.gamePlayer != this.firingGamePlayerID) {
           //
+        }
+      });
+    },
+
+    organizeFleet(fleet) {
+      //REMOVE IF NOT USED
+      console.log("trying to organize ships");
+      fleet.sort(function(ship1, ship2) {
+        if (ship1.maxHP === ship2.maxHP) {
+          if (ship1.type === "Destroyer") {
+            return -1;
+          } else return 1;
+        } else {
+          return ship2.maxHP - ship1.maxHP;
         }
       });
     }
