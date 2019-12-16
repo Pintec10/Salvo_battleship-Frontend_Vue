@@ -1,77 +1,81 @@
 <template>
-  <v-container>
-    <h1 class="text-center">Games Dashboard</h1>
-    <div class="my-3" v-if="loaded === true">
-      <v-data-table
-        :headers="headers"
-        :items="sourcedata['games_info']"
-        :loading="!loaded"
-        sort-by="total_score"
-        :sort-desc="true"
-        :search="search"
-      >
-        <template v-slot:top>
-          <v-row class="mx-1">
-            <v-btn
-              outlined
-              class="ma-2"
-              color="red"
-              dark
-              v-if="logged"
-              @click="searchValue(sourcedata['current_user'].name)"
-            >
-              <v-icon small class="mr-1">mdi-crosshairs</v-icon>Your games
-            </v-btn>
-            <v-text-field
-              v-model="search"
-              class="ml-1 mr-3"
-              prepend-icon="mdi-magnify"
-              label="Search"
-              clearable
-            ></v-text-field>
-            <!--<v-btn class="ma-2" color="black" outlined @click="searchValue('')">Reset</v-btn>-->
-            <v-btn
-              :disabled="!logged"
-              class="my-2 ml-8 mr-2"
-              color="blue"
-              :dark="logged"
-              @click="createNewGame"
-            >Create New game</v-btn>
-          </v-row>
-        </template>
-        <template v-slot:item.action="{item}">
-          <!-- WILL ADD CONDITIONS FOR ENDED GAMES!! -->
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
+  <!-- :items="sourcedata['games_info']" -->
+  <div class="background">
+    <v-container>
+      <h1 class="text-center my-3 black--text">Games Dashboard</h1>
+      <div class="my-3" v-if="loaded === true">
+        <v-data-table
+          class="table-main pa-3"
+          :headers="headers"
+          :items="onlyActiveGames"
+          :loading="!loaded"
+          sort-by="total_score"
+          :sort-desc="true"
+          :search="search"
+        >
+          <template v-slot:top>
+            <v-row class="mx-1">
               <v-btn
-                icon
-                v-if="!userParticipates(item) && logged && !gameIsFull(item)"
-                v-on="on"
-                @click="joinExistingGame(item.id)"
+                outlined
+                class="ma-2"
+                color="red lighten-1"
+                dark
+                v-if="logged"
+                @click="searchValue(sourcedata['current_user'].name)"
               >
-                <v-icon>mdi-feather</v-icon>
+                <v-icon small class="mr-1">mdi-crosshairs</v-icon>Your games
               </v-btn>
-            </template>
-            <span>Join game</span>
-          </v-tooltip>
+              <v-text-field
+                v-model="search"
+                class="ml-1 mr-3"
+                prepend-icon="mdi-magnify"
+                label="Search"
+                clearable
+              ></v-text-field>
+              <!--<v-btn class="ma-2" color="black" outlined @click="searchValue('')">Reset</v-btn>-->
+              <v-btn
+                :disabled="!logged"
+                class="my-2 ml-8 mr-2"
+                color="blue"
+                :dark="logged"
+                @click="createNewGame"
+              >Create New game</v-btn>
+            </v-row>
+          </template>
+          <template v-slot:item.action="{item}">
+            <!-- WILL ADD CONDITIONS FOR ENDED GAMES!! -->
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  v-if="!userParticipates(item) && logged && !gameIsFull(item)"
+                  v-on="on"
+                  @click="joinExistingGame(item.id)"
+                >
+                  <v-icon>mdi-feather</v-icon>
+                </v-btn>
+              </template>
+              <span>Join game</span>
+            </v-tooltip>
 
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                v-if="userParticipates(item) && logged"
-                @click="continueGame(item.gameplayers)"
-                v-on="on"
-              >
-                <v-icon>mdi-play-pause</v-icon>
-              </v-btn>
-            </template>
-            <span>Continue game</span>
-          </v-tooltip>
-        </template>
-      </v-data-table>
-    </div>
-  </v-container>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  v-if="userParticipates(item) && logged"
+                  @click="continueGame(item.gameplayers)"
+                  v-on="on"
+                >
+                  <v-icon>mdi-play-pause</v-icon>
+                </v-btn>
+              </template>
+              <span>Continue game</span>
+            </v-tooltip>
+          </template>
+        </v-data-table>
+      </div>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -169,7 +173,13 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["logged"])
+    ...mapGetters(["logged"]),
+
+    onlyActiveGames() {
+      return this.sourcedata["games_info"].filter(
+        oneGame => oneGame.gameplayers[0].score === null
+      );
+    }
   },
 
   created() {
@@ -196,5 +206,16 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.background {
+  background-image: url("../assets/background_03.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  height: 100%;
+}
+
+.table-main {
+  background-color: hsla(0, 50%, 0%, 0.8);
+}
 </style>

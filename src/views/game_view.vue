@@ -1,128 +1,202 @@
 <template>
-  <v-container>
-    <!-- Popup for alerts -->
-    <div class="d-flex justify-center">
-      <v-alert
-        :value="alertPopup.visible"
-        :color="alertPopup.type"
-        dark
-        :type="alertPopup.type"
-        prominent
-        dense
-        dismissible
-        transition="scale"
-        class="absolute"
-      >{{alertPopup.message}}</v-alert>
-    </div>
-
-    <div v-if="loaded" class="d-flex justify-space-around mt-3">
-      <!-- Viewer's grid area -->
-      <div class="d-flex flex-column align-center mr-5">
-        <h2 class="mb-2">You: {{playerInfo(true, "name")}}</h2>
-
-        <div class="d-flex justify-space-around">
-          <div class="mr-5">
-            <Fleet
-              :isViewersFleet="true"
-              :fleetData="gamedata.ships"
-              :viewerGPid="$route.params.gpId"
-              :battleStatus="gamedata.battleStatus"
-              :fleetStatus="selectFleetStatus(true)"
-              :updatingFleet="updatingFleet"
-            />
-          </div>
-          <div class="d-flex flex-column align-center">
-            <GameGrid
-              :gamedata="gamedata"
-              :rows="rows"
-              :columns="columns"
-              :isViewersGrid="true"
-              :firingGamePlayerID="playerInfo(false, 'GPID')"
-              :placingShips="placingShips"
-              :loaded="loaded"
-              :firingSalvoes="false"
-            />
-            <v-btn
-              :dark="shipPlacementList.length === 5"
-              v-if="placingShips"
-              :disabled="shipPlacementList.length !== 5"
-              color="deep-orange accent-3"
-              class="mt-5"
-              @click="postPlacedShips(shipPlacementList)"
-            >READY TO GO!</v-btn>
-          </div>
-        </div>
-      </div>
-
-      <!-- Opponent's grid area -->
-      <div class="d-flex flex-column align-center ml-5">
-        <h2 class="mb-2">Your opponent: {{playerInfo(false, "name")}}</h2>
-
-        <div class="d-flex justify-space-between">
-          <div class="d-flex flex-column align-center">
-            <GameGrid
-              :gamedata="gamedata"
-              :rows="rows"
-              :columns="columns"
-              :isViewersGrid="false"
-              :firingGamePlayerID="playerInfo(true, 'GPID')"
-              :placingShips="false"
-              :loaded="loaded"
-              :firingSalvoes="firingSalvoes"
-            />
-            <v-btn
-              :dark="salvoPlacementList.length === 5 && gamedata.setupComplete"
-              v-if="!placingShips"
-              :disabled="salvoPlacementList.length !== 5 || !firingSalvoes || !gamedata.setupComplete"
-              color="red darken-2"
-              class="mt-5"
-              @click="postPlacedSalvoes(salvoPlacementList)"
-            >
-              <div v-if="!firingSalvoes || !gamedata.setupComplete">
-                <v-icon class="mr-1">mdi-timer-sand</v-icon>Waiting...
-              </div>
-              <div v-else>
-                <v-icon class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
-              </div>
-            </v-btn>
-          </div>
-          <div class="ml-5">
-            <Fleet
-              :isViewersFleet="false"
-              :fleetData="gamedata.ships"
-              :viewerGPid="this.$route.params.gpId"
-              :battleStatus="gamedata.battleStatus"
-              :fleetStatus="selectFleetStatus(false)"
-              :updatingFleet="updatingFleet"
-            />
-          </div>
+  <div class="background">
+    <div class="game-view-container">
+      <v-container>
+        <!-- Popup for alerts -->
+        <div class="d-flex justify-center">
+          <v-alert
+            :value="alertPopup.visible"
+            :color="alertPopup.type"
+            dark
+            :type="alertPopup.type"
+            prominent
+            dense
+            dismissible
+            transition="scale"
+            class="absolute"
+          >{{alertPopup.message}}</v-alert>
         </div>
 
-        <audio id="target">
-          <source src="../assets/sounds/bleep02.wav" />
-        </audio>
-        <audio id="cancel">
-          <source src="../assets/sounds/cancel02.wav" />
-        </audio>
-        <audio id="launch">
-          <source src="../assets/sounds/launch04.wav" />
-        </audio>
-      </div>
-    </div>
+        <div v-if="loaded" class="d-flex justify-space-around mt-3">
+          <!-- Viewer's grid area -->
+          <div class="d-flex flex-column align-center mr-5">
+            <h2 class="mb-2">You: {{playerInfo(true, "name")}}</h2>
 
-    <!-- dragdroptest -->
-    <!-- <div class="my-3">
+            <div class="d-flex justify-space-around">
+              <div class="mr-5">
+                <Fleet
+                  :isViewersFleet="true"
+                  :fleetData="gamedata.ships"
+                  :viewerGPid="$route.params.gpId"
+                  :battleStatus="gamedata.battleStatus"
+                  :fleetStatus="selectFleetStatus(true)"
+                  :updatingFleet="updatingFleet"
+                />
+              </div>
+              <div class="d-flex flex-column align-center">
+                <GameGrid
+                  :gamedata="gamedata"
+                  :rows="rows"
+                  :columns="columns"
+                  :isViewersGrid="true"
+                  :firingGamePlayerID="playerInfo(false, 'GPID')"
+                  :placingShips="placingShips"
+                  :loaded="loaded"
+                  :firingSalvoes="false"
+                />
+                <v-btn
+                  :dark="shipPlacementList.length === 5"
+                  v-if="placingShips"
+                  :disabled="shipPlacementList.length !== 5"
+                  color="deep-orange accent-3"
+                  class="mt-5"
+                  @click="postPlacedShips(shipPlacementList)"
+                >READY TO GO!</v-btn>
+              </div>
+            </div>
+          </div>
+
+          <!--  Area with state info and general game info -->
+          <div class="d-flex flex-column justify-center align-center">
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-btn small fab color="blue-grey lighten-4" class="my-2" v-on="on" ripple="false">
+                  <v-icon dark small :color="stateInfo.color" v-on="on">{{stateInfo.icon}}</v-icon>
+                </v-btn>
+              </template>
+              <span>{{stateInfo.message}}</span>
+            </v-tooltip>
+
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-btn fab dark color="blue" class="my-2" @click="overlay = !overlay">
+                  <v-icon large>mdi-information-variant</v-icon>
+                </v-btn>
+
+                <v-overlay :value="overlay" opacity="0.8">
+                  <div class="pa-8">
+                    <v-btn icon large @click="overlay = false" color="red">
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <p>
+                      Start arranging your boats by dragging them on your game grid. You can rotate a ship by
+                      pushing the rotation button on its upper left corner.
+                      You must wait for your opponent to place their ships too before you can start firing salvoes.
+                    </p>
+                    <p>
+                      You can fire a salvo of
+                      <span class="font-weight-bold">5 shots</span> each turn. You select/unselect a case by
+                      clicking on it on your opponent's grid.
+                      Then push the "Fire!" button: you will see immediately the result of your shots,
+                      but you must wait until your opponent has done the same before you can fire another salvo.
+                    </p>
+                    <p>
+                      The "Fleet status" panel on the left shows the damage suffered by your boats,and if
+                      they have been sunken. Your opponent's Fleet Status panel only shows which ships have been sunken.
+                    </p>
+                    <p>
+                      When all of a player's ships are sunk, the game ends and the winner gets 1 point.
+                      If both players get their ships sunken on the same round, a tie occurs and each gets 0.5 points.
+                    </p>
+                    <p>
+                      <span class="font-weight-bold">TIP:</span> Hover on the small icon in the center of the screen,
+                      just above the "Information" button, to know if you are ready to submit a salvo or
+                      need to wait for your opponent.
+                    </p>
+                  </div>
+                </v-overlay>
+              </template>
+              <span>Click for game rules</span>
+            </v-tooltip>
+          </div>
+
+          <!-- Opponent's grid area -->
+          <div class="d-flex flex-column align-center ml-5">
+            <h2 class="mb-2">Your opponent: {{playerInfo(false, "name")}}</h2>
+
+            <div class="d-flex justify-space-between">
+              <div class="d-flex flex-column align-center">
+                <GameGrid
+                  :gamedata="gamedata"
+                  :rows="rows"
+                  :columns="columns"
+                  :isViewersGrid="false"
+                  :firingGamePlayerID="playerInfo(true, 'GPID')"
+                  :placingShips="false"
+                  :loaded="loaded"
+                  :firingSalvoes="firingSalvoes"
+                />
+                <v-btn
+                  :dark="salvoPlacementList.length === 5 && gamedata.setupComplete"
+                  v-if="!placingShips && !gamedata.gameOver"
+                  :disabled="salvoPlacementList.length !== 5 || !firingSalvoes || !gamedata.setupComplete"
+                  color="red darken-2"
+                  class="mt-5"
+                  @click="postPlacedSalvoes(salvoPlacementList)"
+                >
+                  <div v-if="!firingSalvoes || !gamedata.setupComplete">
+                    <v-icon class="mr-1">mdi-timer-sand</v-icon>Waiting...
+                  </div>
+                  <div v-else>
+                    <v-icon class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
+                  </div>
+                </v-btn>
+              </div>
+              <div class="ml-5">
+                <Fleet
+                  :isViewersFleet="false"
+                  :fleetData="gamedata.ships"
+                  :viewerGPid="this.$route.params.gpId"
+                  :battleStatus="gamedata.battleStatus"
+                  :fleetStatus="selectFleetStatus(false)"
+                  :updatingFleet="updatingFleet"
+                />
+              </div>
+            </div>
+
+            <audio id="target">
+              <source src="../assets/sounds/bleep02.wav" />
+            </audio>
+            <audio id="cancel">
+              <source src="../assets/sounds/cancel02.wav" />
+            </audio>
+            <audio id="launch">
+              <source src="../assets/sounds/launch04.wav" />
+            </audio>
+          </div>
+        </div>
+
+        <!-- BOTTOM SHEET TO SHOW THAT GAME IS OVER -->
+        <div class="text-center">
+          <v-bottom-sheet v-model="bottomSheet" :activator="gamedata.gameOver">
+            <v-sheet class="text-center" height="200px">
+              <v-icon
+                dark
+                x-large
+                :color="stateInfo.color"
+                class="my-3"
+                v-on="on"
+              >{{stateInfo.icon}}</v-icon>
+              <div class="my-3">{{stateInfo.message}}</div>
+              <v-btn class="mt-6" dark color="red" @click="sheet = !sheet">close</v-btn>
+            </v-sheet>
+          </v-bottom-sheet>
+        </div>
+
+        <!-- dragdroptest -->
+        <!-- <div class="my-3">
       <p>dragdrop area</p>
       <drag id="dragbox" class="dragtest ma-1 pa-3" :transfer-data="test" drop-effect="move"></drag>
       <drop class="dragtest-2 ma-1 pa-1" @drop="handleDrop"></drop>
-    </div>-->
-  </v-container>
+        </div>-->
+      </v-container>
+    </div>
+  </div>
 </template>
 
 <script>
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
-//import { Drag, Drop } from "vue-drag-drop";
 import Fleet from "@/components/Fleet.vue";
 
 export default {
@@ -140,9 +214,10 @@ export default {
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
       placingShips: false,
-      gameOn: false, //check in the end if it is actually needed!
       firingSalvoes: false,
       updatingFleet: false,
+      overlay: false,
+      sheet: true,
       defaultShipList: [
         {
           type: "Aircraft Carrier",
@@ -347,7 +422,6 @@ export default {
 
       let fleet = selectedReport.fleetStatus;
       if (fleet.length > 1) {
-        console.log("trying to organize ships");
         for (let i = 0; i < fleet.length - 1; i++) {
           for (let j = i + 1; j < fleet.length; j++) {
             if (
@@ -380,7 +454,43 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["alertPopup", "shipPlacementList", "salvoPlacementList"])
+    ...mapGetters(["alertPopup", "shipPlacementList", "salvoPlacementList"]),
+
+    stateInfo() {
+      let output = {};
+      output.color = "blue";
+      output.icon = "mdi-timer-sand";
+      output.message = "Waiting for your opponent...";
+      if (this.gamedata.gameOver) {
+        if (this.gamedata.opponentVictory && this.gamedata.viewerVictory) {
+          output.icon = "mdi-emoticon-neutral";
+          output.color = "amber";
+          output.message = "It's a tie!";
+        } else if (this.gamedata.viewerVictory) {
+          output.icon = "mdi-trophy-award";
+          output.color = "green";
+          output.message = "You won!";
+        } else if (this.gamedata.opponentVictory) {
+          output.icon = "mdi-skull";
+          output.color = "red";
+          output.message = "You lost...";
+        }
+      } else if (this.placingShips) {
+        output.icon = "mdi-ferry";
+        output.message =
+          "Arrange your ships by dragging and rotating them, then push 'Ready to go!'";
+      } else if (this.firingSalvoes) {
+        output.icon = "mdi-crosshairs-gps";
+        output.message =
+          "Click on the opponent's grid to place your shots, then push 'Fire!'";
+      }
+
+      return output;
+    },
+
+    bottomSheet() {
+      return this.gamedata.gameOver && this.sheet;
+    }
   },
 
   created() {
@@ -388,14 +498,14 @@ export default {
     this.updateShipPlacementList([]);
     this.updateSalvoPlacementList("reset");
     this.dataUpdater = setInterval(() => {
+      console.log("updating");
       if (!this.placingShips) {
         this.getGameData();
       }
+      if (this.gamedata.gameOver) {
+        clearInterval(this.dataUpdater);
+      }
     }, 5000);
-
-    //  function startAnnoying() {
-    //timerId = setInterval(function() { console.log("hi"); }, 1000);
-    //}
   }
 };
 </script>
@@ -403,6 +513,20 @@ export default {
 <style scoped>
 .absolute {
   position: absolute;
+}
+
+.background {
+  background-image: url("../assets/background_03.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  height: 100%;
+}
+
+.game-view-container {
+  background-color: hsla(0, 50%, 0%, 0.7);
+  height: 100%;
+  /* width: 100vw; */
 }
 
 .test {

@@ -1,9 +1,10 @@
 <template>
-  <div>
-    <h1 class="text-center mt-3">Leaderboard</h1>
-    <v-container class="my-3">
+  <div class="background">
+    <v-container>
+      <h1 class="text-center my-3 black--text">Leaderboard</h1>
       <div v-if="loaded === true">
         <v-data-table
+          class="table-main"
           :headers="headers"
           :items="sourcedata['scores_info']"
           :loading="!loaded"
@@ -72,5 +73,15 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.background {
+  background-image: url("../assets/background_03.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  height: 100%;
+}
+.table-main {
+  background-color: hsla(0, 50%, 0%, 0.8);
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-3 grid">
+  <div class="mb-3 grid" :class="{'glowing':!isViewersGrid && firingSalvoes && !gamedata.gameOver}">
     <!--first row -->
     <div class="d-flex">
       <div class="gridcell"></div>
@@ -80,7 +80,7 @@
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
           <!--clickable div to submit a shot-->
           <div
-            v-else-if="firingSalvoes"
+            v-else-if="firingSalvoes && !gamedata.gameOver"
             @click="updateSalvoPlacementList(cellname(i, j))"
             class="gridcell d-flex justify-center align-center"
             :class="{targeted: onSalvoPlacementList(cellname(i, j))}"
@@ -343,7 +343,7 @@ export default {
   width: 5.5vmin;
   height: 5.5vmin;
   background-size: cover;
-  box-sizing: border-box;
+  box-sizing: content-box;
 }
 
 .cellborder {
@@ -351,19 +351,40 @@ export default {
   /*outline: 1px dotted white;*/
 }
 
-/* RESTORE THESE IF YOU WANT BORDER AROUND GRID 
-.gridrow .gridcolumn:nth-child(2) .cellborder {
-  border-left: 1px solid grey;
+/* GLOWING BORDER AROUND GRID  */
+
+.grid .gridrow .gridcolumn:nth-child(2) .cellborder {
+  border-left: 3px outset white;
 }
-.gridrow .gridcolumn:last-child .cellborder {
-  border-right: 1px solid grey;
+.grid .gridrow .gridcolumn:last-child .cellborder {
+  border-right: 3px outset white;
 }
 .grid .gridrow:nth-child(2) .cellborder {
-  border-top: 1px solid grey;
+  border-top: 3px outset white;
 }
 .grid .gridrow:last-child .cellborder {
-  border-bottom: 1px solid grey;
-}*/
+  border-bottom: 3px outset white;
+}
+.glowing .gridrow .gridcolumn:nth-child(2) .cellborder,
+.glowing .gridrow .gridcolumn:last-child .cellborder,
+.glowing .gridrow:nth-child(2) .cellborder,
+.glowing .gridrow:last-child .cellborder {
+  animation-name: gridglow;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes gridglow {
+  0% {
+    border-color: white;
+  }
+  50% {
+    border-color: rgb(250, 152, 41);
+  }
+  100% {
+    border-color: white;
+  }
+}
 
 .water {
   background-image: url("../assets/water.jpg");

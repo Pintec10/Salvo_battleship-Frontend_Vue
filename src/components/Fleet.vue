@@ -2,7 +2,7 @@
   <div>
     <div class="my-2 text-center">
       <h3 class="ma-0 font-weight-bold">Fleet Status</h3>
-      <p v-if="fleetStatus.length === 0" class="mt-5">Waiting...</p>
+      <p v-if="fleetStatus.length === 0" class="mt-5">Waiting for ship placement...</p>
     </div>
 
     <div v-if="fleetStatus.length === 0" class="d-flex">
