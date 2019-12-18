@@ -74,7 +74,6 @@ export default new Vuex.Store({
 
   actions: {
     login: (context, payload) => {
-      console.log("logging in");
       var credentials = {
         username: payload.username,
         password: payload.password
@@ -104,7 +103,6 @@ export default new Vuex.Store({
           } else { return Promise.reject(new Error(response.statusText)) }
         })
         .then(() => {
-          console.log("login ok")
           context.dispatch("fetchActiveUserContent");
           router.push("/game_list");
         })
