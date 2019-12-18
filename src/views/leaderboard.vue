@@ -12,6 +12,16 @@
           :sort-desc="true"
         ></v-data-table>
       </div>
+
+      <!-- here testing socket -->
+      <div>
+        <h3>here to show communication with server...</h3>
+        <p>{{testSocketText}}</p>
+      </div>
+      <div class="my-2">
+        <v-text-field v-model="testInputText"></v-text-field>
+        <v-btn @click="sendMessage(testInputText)">SEND MESSAGE</v-btn>
+      </div>
     </v-container>
   </div>
 </template>
@@ -55,20 +65,74 @@ export default {
           value: "total_score",
           align: "center"
         }
-      ]
+      ],
+
+      //for socket testing
+      websocket: null,
+      testSocketText: "",
+      testInputText: ""
     };
   },
 
-  methods: {},
+  //these methods are for testing websocket
+  methods: {
+    processOpen(message) {
+      console.log("opening connection with server");
+      this.testSocketText += "Opening connection on message: " + message + "\n";
+    },
+
+    processClose(message) {
+      this.testSocketText += "Closing connection on message: " + message + "\n";
+      console.log("closing connection with server");
+      this.websocket.send("client disonnected"); // had to add a "this" here... correct?
+    },
+
+    processError(message) {
+      console.log("there was an error");
+      this.testSocketText += "An error occurred: " + message + "\n";
+    },
+
+    processMessage(message) {
+      this.testSocketText +=
+        "Receive this message from server: " + message + "\n";
+    },
+
+    sendMessage(inputMessage) {
+      this.websocket.send(inputMessage);
+      if (inputMessage !== "close") {
+        this.testSocketText +=
+          "Sent this message to server: " + inputMessage + "\n";
+        this.testInputText = "";
+      } else {
+        this.websocket.close();
+      }
+    }
+  },
 
   created() {
     fetch("/api/games")
       .then(response => response.json())
       .then(json => {
         this.sourcedata = json;
-        console.log(this.sourcedata);
         this.loaded = true;
       });
+
+    //here testing socket initialization with created; check URL @ 8:50 in YT
+    // also check if necessary to change arrow function
+    this.websocket = new WebSocket("ws://localhost:8080/salvo/serverEndpoint");
+    //this.websocket = new WebSocket("ws://localhost:8080/salvo/serverEndpoint");
+    this.websocket.onopen = message => {
+      this.processOpen(message);
+    };
+    this.websocket.onclose = message => {
+      this.processClose(message);
+    };
+    this.websocket.onError = () => {
+      this.processError();
+    };
+    this.websocket.onmessage = message => {
+      this.processMessage(message);
+    };
   }
 };
 </script>
