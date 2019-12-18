@@ -66,7 +66,6 @@ export default {
       .then(response => response.json())
       .then(json => {
         this.sourcedata = json;
-        console.log(this.sourcedata);
         this.loaded = true;
       });
   }

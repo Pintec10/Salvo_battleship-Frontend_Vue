@@ -3,6 +3,6 @@ module.exports = {
     "vuetify"
   ],
   devServer: {
-    proxy: "http://localhost:8080"
+    proxy: "https://infinite-shore-25867.herokuapp.com/"
   }
 }
