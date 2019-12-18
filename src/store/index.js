@@ -30,7 +30,9 @@ export default new Vuex.Store({
   mutations: {
     login: (state, payload) => {
       state.loggedUser = payload;
-      state.logged = true;
+      if (payload.id === null) {
+        state.logged = false;
+      } else state.logged = true;
     },
     logout: (state) => {
       state.loggedUser.id = null;

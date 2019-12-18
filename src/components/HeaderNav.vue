@@ -26,10 +26,6 @@
         <span>Games</span>
       </v-tooltip>
 
-      <!--<v-btn class="mx-1" to="/game_view/1" icon :disabled="!logged">
-        <v-icon>mdi-ferry</v-icon>
-      </v-btn>-->
-
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn to="/leaderboard" icon v-on="on">
@@ -70,11 +66,15 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["logout"])
+    ...mapActions(["logout", "fetchActiveUserContent"])
   },
 
   computed: {
     ...mapGetters(["loggedUser", "logged"])
+  },
+
+  created() {
+    this.fetchActiveUserContent();
   }
 };
 </script>

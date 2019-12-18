@@ -60,7 +60,7 @@
           <div class="d-flex flex-column justify-center align-center">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-btn small fab color="blue-grey lighten-4" class="my-2" v-on="on" ripple="false">
+                <v-btn small fab color="blue-grey lighten-4" class="my-2" v-on="on" :ripple="false">
                   <v-icon dark small :color="stateInfo.color" v-on="on">{{stateInfo.icon}}</v-icon>
                 </v-btn>
               </template>
@@ -161,34 +161,22 @@
               <source src="../assets/sounds/cancel02.wav" />
             </audio>
             <audio id="launch">
-              <source src="../assets/sounds/launch04.wav" />
+              <source src="../assets/sounds/launch03.wav" />
             </audio>
           </div>
         </div>
 
         <!-- BOTTOM SHEET TO SHOW THAT GAME IS OVER -->
         <div class="text-center">
-          <v-bottom-sheet v-model="bottomSheet" :activator="gamedata.gameOver">
+          <v-bottom-sheet v-model="bottomSheet">
             <v-sheet class="text-center" height="200px">
-              <v-icon
-                dark
-                x-large
-                :color="stateInfo.color"
-                class="my-3"
-                v-on="on"
-              >{{stateInfo.icon}}</v-icon>
+              <v-icon dark x-large :color="stateInfo.color" class="my-4">{{stateInfo.icon}}</v-icon>
+
               <div class="my-3">{{stateInfo.message}}</div>
               <v-btn class="mt-6" dark color="red" @click="sheet = !sheet">close</v-btn>
             </v-sheet>
           </v-bottom-sheet>
         </div>
-
-        <!-- dragdroptest -->
-        <!-- <div class="my-3">
-      <p>dragdrop area</p>
-      <drag id="dragbox" class="dragtest ma-1 pa-3" :transfer-data="test" drop-effect="move"></drag>
-      <drop class="dragtest-2 ma-1 pa-1" @drop="handleDrop"></drop>
-        </div>-->
       </v-container>
     </div>
   </div>
@@ -218,6 +206,7 @@ export default {
       updatingFleet: false,
       overlay: false,
       sheet: true,
+      playLaunchSound: false,
       defaultShipList: [
         {
           type: "Aircraft Carrier",
@@ -342,7 +331,6 @@ export default {
     },
 
     getGameData() {
-      console.log("calling getgamedata");
       fetch("/api/game_view/" + this.$route.params.gpId)
         .then(response => response.json())
         .then(json => {
@@ -360,11 +348,14 @@ export default {
           }
           this.shipSort();
           this.loaded = true;
+          if (this.playLaunchSound) {
+            document.getElementById("launch").play();
+            this.playLaunchSound = false;
+          }
         });
     },
 
     postPlacedSalvoes(targetLocationsList) {
-      //document.getElementById("launch").play();
       let responseState = "";
       let salvo = {};
       salvo.locations = targetLocationsList;
@@ -384,10 +375,10 @@ export default {
           if (responseState === "error") {
             return Promise.reject(new Error(respMessage));
           } else {
-            //document.getElementById("launch").play();
             this.loaded = false;
             this.firingSalvoes = false;
             this.updateSalvoPlacementList("reset");
+            this.playLaunchSound = true;
             this.getGameData();
           }
         })
@@ -497,6 +488,7 @@ export default {
     this.getGameData();
     this.updateShipPlacementList([]);
     this.updateSalvoPlacementList("reset");
+
     this.dataUpdater = setInterval(() => {
       console.log("updating");
       if (!this.placingShips) {
@@ -506,6 +498,10 @@ export default {
         clearInterval(this.dataUpdater);
       }
     }, 5000);
+  },
+
+  beforeDestroy() {
+    clearInterval(this.dataUpdater);
   }
 };
 </script>
@@ -526,7 +522,6 @@ export default {
 .game-view-container {
   background-color: hsla(0, 50%, 0%, 0.7);
   height: 100%;
-  /* width: 100vw; */
 }
 
 .test {

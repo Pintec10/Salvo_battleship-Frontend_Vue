@@ -11,8 +11,8 @@
         <div class="my-auto">{{rows[i]}}</div>
       </div>
       <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
+        
         <!-- ACTUAL GAME CELL DOWN HERE -->
-
         <Drop
           @drop="handleDrop({row: row, col: column}, ...arguments)"
           class="gridcell cellborder d-flex align-center water"

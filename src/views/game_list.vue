@@ -1,5 +1,4 @@
 <template>
-  <!-- :items="sourcedata['games_info']" -->
   <div class="background">
     <v-container>
       <h1 class="text-center my-3 black--text">Games Dashboard</h1>
@@ -16,12 +15,12 @@
           <template v-slot:top>
             <v-row class="mx-1">
               <v-btn
-                outlined
+                :outlined="!yourGamesFilterIsOn"
                 class="ma-2"
                 color="red lighten-1"
                 dark
                 v-if="logged"
-                @click="searchValue(sourcedata['current_user'].name)"
+                @click="OnlyUserFilter(sourcedata['current_user'].name)"
               >
                 <v-icon small class="mr-1">mdi-crosshairs</v-icon>Your games
               </v-btn>
@@ -32,7 +31,6 @@
                 label="Search"
                 clearable
               ></v-text-field>
-              <!--<v-btn class="ma-2" color="black" outlined @click="searchValue('')">Reset</v-btn>-->
               <v-btn
                 :disabled="!logged"
                 class="my-2 ml-8 mr-2"
@@ -119,6 +117,12 @@ export default {
   },
 
   methods: {
+    OnlyUserFilter(user) {
+      if (this.search === this.sourcedata["current_user"].name) {
+        this.search = "";
+      } else this.searchValue(user);
+    },
+
     searchValue(value) {
       this.search = value;
     },
@@ -179,6 +183,10 @@ export default {
       return this.sourcedata["games_info"].filter(
         oneGame => oneGame.gameplayers[0].score === null
       );
+    },
+
+    yourGamesFilterIsOn() {
+      return this.search === this.sourcedata["current_user"].name;
     }
   },
 
