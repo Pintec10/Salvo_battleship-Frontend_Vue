@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '@/router'
-const proxi = "https://infinite-shore-25867.herokuapp.com/"
+const proxi = "https://infinite-shore-25867.herokuapp.com"
 Vue.use(Vuex)
 
 export default new Vuex.Store({

@@ -186,7 +186,7 @@
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
 import Fleet from "@/components/Fleet.vue";
-const proxi = "https://infinite-shore-25867.herokuapp.com/";
+const proxi = "https://infinite-shore-25867.herokuapp.com";
 
 export default {
   name: "game_view",

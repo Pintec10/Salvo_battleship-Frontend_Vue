@@ -78,7 +78,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-const proxi = "https://infinite-shore-25867.herokuapp.com/";
+const proxi = "https://infinite-shore-25867.herokuapp.com";
 
 export default {
   name: "game_list",
