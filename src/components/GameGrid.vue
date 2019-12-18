@@ -11,7 +11,6 @@
         <div class="my-auto">{{rows[i]}}</div>
       </div>
       <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
-        
         <!-- ACTUAL GAME CELL DOWN HERE -->
         <Drop
           @drop="handleDrop({row: row, col: column}, ...arguments)"
@@ -251,8 +250,6 @@ export default {
 
       //if all ok, adding the ship to the list and dropping it down
       if (conflict === false) {
-        console.log("checks passed, pushing and appending");
-
         //removing same ship from array if already present
         shipArray.forEach((oneExistingShip, index) => {
           if (oneExistingShip.type === newShip.type) {
@@ -263,7 +260,6 @@ export default {
         shipArray.push(newShip);
         this.updateShipPlacementList(shipArray);
       } else {
-        console.log("checks not passed!");
         this.alertPopupOn({ type: "error", message: errorMessage });
         setTimeout(() => {
           this.alertPopupOff();

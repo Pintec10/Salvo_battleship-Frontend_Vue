@@ -92,8 +92,6 @@ export default {
     },
 
     organizeFleet(fleet) {
-      //REMOVE IF NOT USED
-      console.log("trying to organize ships");
       fleet.sort(function(ship1, ship2) {
         if (ship1.maxHP === ship2.maxHP) {
           if (ship1.type === "Destroyer") {

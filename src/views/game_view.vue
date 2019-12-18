@@ -490,7 +490,6 @@ export default {
     this.updateSalvoPlacementList("reset");
 
     this.dataUpdater = setInterval(() => {
-      console.log("updating");
       if (!this.placingShips) {
         this.getGameData();
       }
