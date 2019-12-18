@@ -193,7 +193,7 @@ export default {
   },
 
   created() {
-    fetch(proxi + "/api/games")
+    fetch(proxi + "/api/games", { credentials: "include" })
       .then(response => response.json())
       .then(json => {
         this.sourcedata = json;
