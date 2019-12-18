@@ -125,7 +125,7 @@ export default new Vuex.Store({
         })
         .then(response => response.json())
         .then(json => {
-          console.log(json);
+
 
           context.commit("login", json.current_user);
         })
