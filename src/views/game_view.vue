@@ -335,7 +335,9 @@ export default {
     },
 
     getGameData() {
-      fetch(proxi + "/api/game_view/" + this.$route.params.gpId)
+      fetch(proxi + "/api/game_view/" + this.$route.params.gpId, {
+        credentials: "include"
+      })
         .then(response => response.json())
         .then(json => {
           this.updatingFleet = true;
