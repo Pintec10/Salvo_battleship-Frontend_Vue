@@ -138,7 +138,7 @@ export default new Vuex.Store({
     },
 
     logout(context) {
-      fetch(proxi + "/api/logout", { method: "POST" })
+      fetch(proxi + "/api/logout", { method: "POST", credentials: 'include' })
         .then(() => {
           context.commit("logout");
           router.push("/login");
