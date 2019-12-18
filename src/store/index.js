@@ -115,7 +115,9 @@ export default new Vuex.Store({
     },
 
     fetchActiveUserContent(context) {
-      fetch(proxi + "/api/games")
+      fetch(proxi + "/api/games", {
+        credentials: 'include',
+      })
         .then(response => {
           if (response.status >= 200 && response.status < 300) {
             return Promise.resolve(response)
@@ -123,6 +125,8 @@ export default new Vuex.Store({
         })
         .then(response => response.json())
         .then(json => {
+          console.log(json);
+
           context.commit("login", json.current_user);
         })
         .catch(error => {
