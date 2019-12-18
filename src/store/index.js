@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '@/router'
-
+const proxi = "https://infinite-shore-25867.herokuapp.com/"
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -89,7 +89,7 @@ export default new Vuex.Store({
         return body.join("&");
       }
 
-      fetch("/api/login", {
+      fetch(proxi + "/api/login", {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -115,7 +115,7 @@ export default new Vuex.Store({
     },
 
     fetchActiveUserContent(context) {
-      fetch("/api/games")
+      fetch(proxi + "/api/games")
         .then(response => {
           if (response.status >= 200 && response.status < 300) {
             return Promise.resolve(response)
@@ -134,7 +134,7 @@ export default new Vuex.Store({
     },
 
     logout(context) {
-      fetch("/api/logout", { method: "POST" })
+      fetch(proxi + "/api/logout", { method: "POST" })
         .then(() => {
           context.commit("logout");
           router.push("/login");
@@ -142,7 +142,7 @@ export default new Vuex.Store({
     },
 
     createUser(context, payload) {
-      fetch("/api/players", {
+      fetch(proxi + "/api/players", {
         credentials: 'include',
         method: "POST",
         headers: { 'Content-Type': 'application/json' },

@@ -186,6 +186,7 @@
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
 import Fleet from "@/components/Fleet.vue";
+const proxi = "https://infinite-shore-25867.herokuapp.com/";
 
 export default {
   name: "game_view",
@@ -297,12 +298,15 @@ export default {
 
     postPlacedShips(shipList) {
       let responseState = "";
-      fetch("/api/games/players/" + this.$route.params.gpId + "/ships", {
-        credentials: "include",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(shipList)
-      })
+      fetch(
+        proxi + "/api/games/players/" + this.$route.params.gpId + "/ships",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(shipList)
+        }
+      )
         .then(response => {
           if (response.status >= 300) {
             responseState = "error";
@@ -331,7 +335,7 @@ export default {
     },
 
     getGameData() {
-      fetch("/api/game_view/" + this.$route.params.gpId)
+      fetch(proxi + "/api/game_view/" + this.$route.params.gpId)
         .then(response => response.json())
         .then(json => {
           this.updatingFleet = true;
@@ -359,12 +363,15 @@ export default {
       let responseState = "";
       let salvo = {};
       salvo.locations = targetLocationsList;
-      fetch("/api/games/players/" + this.$route.params.gpId + "/salvoes", {
-        credentials: "include",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(salvo)
-      })
+      fetch(
+        proxi + "/api/games/players/" + this.$route.params.gpId + "/salvoes",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(salvo)
+        }
+      )
         .then(response => {
           if (response.status >= 300) {
             responseState = "error";

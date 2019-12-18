@@ -78,6 +78,8 @@
 
 <script>
 import { mapGetters } from "vuex";
+const proxi = "https://infinite-shore-25867.herokuapp.com/";
+
 export default {
   name: "game_list",
 
@@ -148,7 +150,7 @@ export default {
     },
 
     createNewGame() {
-      fetch("/api/games", {
+      fetch(proxi + "/api/games", {
         credentials: "include",
         method: "POST"
       })
@@ -162,7 +164,7 @@ export default {
     },
 
     joinExistingGame(gameID) {
-      fetch("/api/game/" + gameID + "/players", {
+      fetch(proxi + "/api/game/" + gameID + "/players", {
         credentials: "include",
         method: "POST"
       })
@@ -191,7 +193,7 @@ export default {
   },
 
   created() {
-    fetch("/api/games")
+    fetch(proxi + "/api/games")
       .then(response => response.json())
       .then(json => {
         this.sourcedata = json;

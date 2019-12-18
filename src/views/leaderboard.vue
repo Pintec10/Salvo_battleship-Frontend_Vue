@@ -17,6 +17,8 @@
 </template>
 
 <script>
+const proxi = "https://infinite-shore-25867.herokuapp.com/";
+
 export default {
   name: "leaderboard",
 
@@ -62,7 +64,7 @@ export default {
   methods: {},
 
   created() {
-    fetch("/api/games")
+    fetch(proxi + "/api/games")
       .then(response => response.json())
       .then(json => {
         this.sourcedata = json;
