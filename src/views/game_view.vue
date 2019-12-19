@@ -354,10 +354,10 @@ export default {
           }
           this.shipSort();
           this.loaded = true;
-          if (this.playLaunchSound) {
-            document.getElementById("launch").play();
-            this.playLaunchSound = false;
-          }
+          //if (this.playLaunchSound) {
+          //  document.getElementById("launch").play();
+          //  this.playLaunchSound = false;
+          //}
         });
     },
 
