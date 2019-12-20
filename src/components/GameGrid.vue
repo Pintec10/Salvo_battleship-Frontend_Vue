@@ -46,7 +46,6 @@
                 <v-img
                   :src="getImageUrl(c, cellContent(i,j).shipLength, cellContent(i,j).isHorizontal)"
                 />
-                <!-- check why is image not displaying or displays only on first drag!! -->
               </div>
             </div>
 
@@ -62,12 +61,6 @@
             >
               <v-icon class="rotate-icon" size="3vmin">mdi-rotate-3d-variant</v-icon>
             </v-btn>
-
-            <!-- <div slot="image" class="shipwrapper" :class="{'flex-column': !ship.horizontal }">
-                  <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell">
-                    <v-img src="../assets/ship-hor-start.png" />
-                  </div>
-            </div>-->
           </Drag>
 
           <v-chip
@@ -344,7 +337,6 @@ export default {
 
 .cellborder {
   box-shadow: 0px 0px 1.5px 0.5px hsla(0, 50%, 100%, 0.6) inset;
-  /*outline: 1px dotted white;*/
 }
 
 /* GLOWING BORDER AROUND GRID  */
@@ -385,8 +377,6 @@ export default {
 .water {
   background-image: url("../assets/water.jpg");
   background-image: url("../assets/giphy_water_1.gif");
-  /* background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif"); */
-  /*background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
 
 .shipwrapper {
@@ -420,8 +410,4 @@ export default {
 .targeted {
   box-shadow: 0px 0px 4vmin 0px rgba(221, 16, 16, 0.8) inset;
 }
-
-/*.highlightable :hover {
-  border: 1px solid gold;
-}*/
 </style>

@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <!-- </div> -->
+        
       </div>
     </div>
   </div>
@@ -59,10 +59,7 @@ export default {
     },
     updatingFleet: {
       type: Boolean
-    } /*
-    battleStatus: {
-      type: Array
-    },*/,
+    } ,
     fleetStatus: {
       type: Array
     }
@@ -145,8 +142,6 @@ export default {
 .water {
   background-image: url("../assets/water.jpg");
   background-image: url("../assets/giphy_water_1.gif");
-  /* background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif"); */
-  /*background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
 
 .test2 {

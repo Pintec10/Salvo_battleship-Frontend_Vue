@@ -231,7 +231,7 @@ export default {
         }
       ],
       defaultStatusReport: {
-        gamePlayer: 27,
+        gamePlayer: 0,
         hitsReceived: null,
         missReceived: null,
         fleetStatus: []
@@ -354,6 +354,7 @@ export default {
           }
           this.shipSort();
           this.loaded = true;
+          // --> to improve for user experience! <--
           //if (this.playLaunchSound) {
           //  document.getElementById("launch").play();
           //  this.playLaunchSound = false;
@@ -411,7 +412,6 @@ export default {
           (isViewersFleet && oneReport.gamePlayer == viewersId) ||
           (!isViewersFleet && oneReport.gamePlayer != viewersId)
         ) {
-          //selectedReport = Object.assign({}, oneReport);
           selectedReport = { ...oneReport };
         }
       });

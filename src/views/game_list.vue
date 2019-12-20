@@ -41,7 +41,6 @@
             </v-row>
           </template>
           <template v-slot:item.action="{item}">
-            <!-- WILL ADD CONDITIONS FOR ENDED GAMES!! -->
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
                 <v-btn

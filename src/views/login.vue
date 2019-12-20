@@ -2,8 +2,6 @@
   <div class="background">
     <v-container class="d-flex justify-center">
       <v-card color="hsla(0, 50%, 0%, 0.7)" class="d-flex flex-column align-center pa-5">
-        <!-- <div class="d-flex flex-column align-center"> -->
-        <!-- <v-card color="green" class="d-flex flex-column align-center my-5"> -->
         <h1 class="mb-12">Login / Sign up</h1>
         <div>
           <v-text-field

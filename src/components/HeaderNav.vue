@@ -61,9 +61,7 @@ import { mapActions } from "vuex";
 export default {
   name: "HeaderNav",
   data() {
-    return {
-      //data here
-    };
+    return {};
   },
   methods: {
     ...mapActions(["logout", "fetchActiveUserContent"])
