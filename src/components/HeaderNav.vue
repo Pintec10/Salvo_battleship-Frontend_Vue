@@ -74,7 +74,7 @@ export default {
   },
 
   created() {
-    //this.fetchActiveUserContent();
+    this.fetchActiveUserContent();
   }
 };
 </script>
