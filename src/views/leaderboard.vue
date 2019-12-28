@@ -1,8 +1,9 @@
 <template>
   <div class="background">
     <v-container>
-      <h1 class="text-center my-3 black--text">Leaderboard</h1>
-      <div v-if="loaded === true">
+      <h1 class="text-center my-3 ">Leaderboard</h1>
+
+      <div>
         <v-data-table
           class="table-main"
           :headers="headers"
@@ -76,13 +77,13 @@ export default {
 
 <style scoped>
 .background {
-  background-image: url("../assets/background_03.jpg");
+  background-image: url("../assets/medal_02.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   height: 100%;
 }
 .table-main {
-  background-color: hsla(0, 50%, 0%, 0.8);
+  background-color: hsla(0, 50%, 0%, 0.8) !important;
 }
 </style>

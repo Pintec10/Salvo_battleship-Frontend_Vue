@@ -38,8 +38,6 @@
             <v-img src="../assets/smoke_15.gif"></v-img>
           </div>
         </div>
-
-        
       </div>
     </div>
   </div>
@@ -59,7 +57,7 @@ export default {
     },
     updatingFleet: {
       type: Boolean
-    } ,
+    },
     fleetStatus: {
       type: Array
     }
@@ -140,7 +138,6 @@ export default {
 }
 
 .water {
-  background-image: url("../assets/water.jpg");
   background-image: url("../assets/giphy_water_1.gif");
 }
 

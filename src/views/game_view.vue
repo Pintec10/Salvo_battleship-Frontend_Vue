@@ -79,24 +79,38 @@
                       <v-icon>mdi-close</v-icon>
                     </v-btn>
                     <p>
-                      Start arranging your boats by dragging them on your game grid. You can rotate a ship by
-                      pushing the rotation button on its upper left corner.
-                      You must wait for your opponent to place their ships too before you can start firing salvoes.
+                      Arrange your boats by dragging them on your game grid. You can rotate a ship by
+                      pushing the
+                      <v-btn
+                        fab
+                        dark
+                        color="deep-orange accent-3"
+                        height="4vmin"
+                        width="4vmin"
+                        class="rotate-button mx-1"
+                      >
+                        <v-icon class="rotate-icon" size="3vmin">mdi-rotate-3d-variant</v-icon>
+                      </v-btn>rotation button. You must wait for your opponent to place their ships too before you can start firing salvoes.
                     </p>
                     <p>
                       You can fire a salvo of
-                      <span class="font-weight-bold">5 shots</span> each turn. You select/unselect a case by
-                      clicking on it on your opponent's grid.
-                      Then push the "Fire!" button: you will see immediately the result of your shots,
+                      <span class="font-weight-bold">5 shots</span> each turn. Select/unselect a case by
+                      clicking on your opponent's grid, then push the
+                      <v-btn x-small dark color="red darken-2" class="mx-1">
+                        <v-icon x-small class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
+                      </v-btn>button. You will see immediately the result of your shots (e.g.
+                      <v-chip dark x-small color="red" class="mx-1">3</v-chip>= successful hit on turn 3,
+                      <v-chip dark x-small color="grey" class="mx-1">1</v-chip>= miss on turn 1),
                       but you must wait until your opponent has done the same before you can fire another salvo.
                     </p>
                     <p>
-                      The "Fleet status" panel on the left shows the damage suffered by your boats,and if
+                      The
+                      <span class="font-weight-bold">"Fleet status"</span> panel on the left shows the damage suffered by your boats, and if
                       they have been sunken. Your opponent's Fleet Status panel only shows which ships have been sunken.
                     </p>
                     <p>
                       When all of a player's ships are sunk, the game ends and the winner gets 1 point.
-                      If both players get their ships sunken on the same round, a tie occurs and each gets 0.5 points.
+                      If both players' fleets get destroyed on the same round, a tie occurs and each gets 0.5 points.
                     </p>
                     <p>
                       <span class="font-weight-bold">TIP:</span> Hover on the small icon in the center of the screen,
@@ -153,23 +167,13 @@
                 />
               </div>
             </div>
-
-            <audio id="target">
-              <source src="../assets/sounds/bleep02.wav" />
-            </audio>
-            <audio id="cancel">
-              <source src="../assets/sounds/cancel02.wav" />
-            </audio>
-            <audio id="launch">
-              <source src="../assets/sounds/launch03.wav" />
-            </audio>
           </div>
         </div>
 
         <!-- BOTTOM SHEET TO SHOW THAT GAME IS OVER -->
         <div class="text-center">
           <v-bottom-sheet v-model="bottomSheet">
-            <v-sheet class="text-center" height="200px">
+            <v-sheet class="text-center" height="200px" color="hsla(0, 50%, 0%, 0.7)">
               <v-icon dark x-large :color="stateInfo.color" class="my-4">{{stateInfo.icon}}</v-icon>
 
               <div class="my-3">{{stateInfo.message}}</div>
@@ -207,7 +211,6 @@ export default {
       updatingFleet: false,
       overlay: false,
       sheet: true,
-      playLaunchSound: false,
       defaultShipList: [
         {
           type: "Aircraft Carrier",
@@ -354,15 +357,11 @@ export default {
           }
           this.shipSort();
           this.loaded = true;
-          // --> to improve for user experience! <--
-          //if (this.playLaunchSound) {
-          //  document.getElementById("launch").play();
-          //  this.playLaunchSound = false;
-          //}
         });
     },
 
     postPlacedSalvoes(targetLocationsList) {
+      document.getElementById("launch").play();
       let responseState = "";
       let salvo = {};
       salvo.locations = targetLocationsList;
@@ -388,7 +387,6 @@ export default {
             this.loaded = false;
             this.firingSalvoes = false;
             this.updateSalvoPlacementList("reset");
-            this.playLaunchSound = true;
             this.getGameData();
           }
         })
@@ -505,7 +503,7 @@ export default {
       if (this.gamedata.gameOver) {
         clearInterval(this.dataUpdater);
       }
-    }, 5000);
+    }, 8000);
   },
 
   beforeDestroy() {

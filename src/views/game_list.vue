@@ -5,10 +5,9 @@
       <div class="my-3" v-if="loaded === true">
         <v-data-table
           class="table-main pa-3"
+          :loading="!loaded"
           :headers="headers"
           :items="onlyActiveGames"
-          :loading="!loaded"
-          sort-by="total_score"
           :sort-desc="true"
           :search="search"
         >
@@ -70,6 +69,15 @@
             </v-tooltip>
           </template>
         </v-data-table>
+      </div>
+      <div class="my-3" v-else>
+        <v-data-table
+          class="table-main"
+          :headers="headers"
+          :items="sourcedata['scores_info']"
+          :loading="!loaded"
+          :sort-desc="true"
+        ></v-data-table>
       </div>
     </v-container>
   </div>
@@ -217,7 +225,7 @@ export default {
 
 <style scoped>
 .background {
-  background-image: url("../assets/background_03.jpg");
+  background-image: url("../assets/Radar-control_02.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -225,6 +233,6 @@ export default {
 }
 
 .table-main {
-  background-color: hsla(0, 50%, 0%, 0.8);
+  background-color: hsla(0, 50%, 0%, 0.8) !important;
 }
 </style>

@@ -1,9 +1,8 @@
 <template>
   <v-app>
     <HeaderNav />
-
     <v-content>
-      <router-view />
+      <router-view class="empty-top-for-spacer" />
     </v-content>
   </v-app>
 </template>
@@ -19,3 +18,9 @@ export default {
   data: () => ({})
 };
 </script>
+
+<style scoped>
+.empty-top-for-spacer {
+  padding-top: 64px;
+}
+</style>

@@ -95,8 +95,5 @@ export default {
   background-attachment: fixed;
   height: 100%;
 }
-
-.test {
-  border: 1px solid red;
-}
 </style>
+ 

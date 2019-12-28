@@ -54,7 +54,14 @@
             @click="createUser(enteredValue)"
           >Register</v-btn>
         </div>
-        <!-- </div> -->
+        <div class="my-3">
+          <v-btn
+            class="mx-2 white--text"
+            color="blue-grey"
+            ripple
+            @click="login(demoCredentials)"
+          >Login as demo player</v-btn>
+        </div>
       </v-card>
     </v-container>
   </div>
@@ -70,6 +77,10 @@ export default {
       enteredValue: {
         username: "",
         password: ""
+      },
+      demoCredentials: {
+        username: "demoplayer@salvo",
+        password: "demo"
       }
     };
   },

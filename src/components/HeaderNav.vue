@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app>
+  <v-app-bar fixed color="rgba(0, 0, 0, 0.8)">
     <v-toolbar-title class="headline text-uppercase">
       <span>SALVO!</span>
     </v-toolbar-title>
@@ -52,6 +52,16 @@
         <span>Logout</span>
       </v-tooltip>
     </div>
+
+    <audio id="target">
+      <source src="../assets/sounds/bleep02.wav" />
+    </audio>
+    <audio id="launch">
+      <source src="../assets/sounds/launch03.wav" />
+    </audio>
+    <audio id="cancel">
+      <source src="../assets/sounds/cancel02.wav" />
+    </audio>
   </v-app-bar>
 </template>
 
