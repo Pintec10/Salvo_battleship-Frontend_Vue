@@ -11,6 +11,9 @@ export default new Vuex.Store({
       id: null,
       name: null
     },
+    loadingLogin: false,
+    loadingRegister: false,
+    loadingDemo: false,
     alertPopup: {
       visible: false,
       message: ""
@@ -22,6 +25,9 @@ export default new Vuex.Store({
   getters: {
     logged: state => { return state.logged; },
     loggedUser: state => { return state.loggedUser; },
+    loadingLogin: state => { return state.loadingLogin },
+    loadingDemo: state => { return state.loadingDemo },
+    loadingRegister: state => { return state.loadingRegister },
     alertPopup: state => { return state.alertPopup },
     shipPlacementList: state => { return state.shipPlacementList },
     salvoPlacementList: state => { return state.salvoPlacementList }
@@ -38,6 +44,15 @@ export default new Vuex.Store({
       state.loggedUser.id = null;
       state.loggedUser.name = null;
       state.logged = false;
+    },
+    setLoadingLogin: (state, payload) => {
+      state.loadingLogin = payload;
+    },
+    setLoadingDemo: (state, payload) => {
+      state.loadingDemo = payload;
+    },
+    setLoadingRegister: (state, payload) => {
+      state.loadingRegister = payload;
     },
     alertPopupOn: (state, payload) => {
       state.alertPopup.visible = true;
@@ -74,6 +89,12 @@ export default new Vuex.Store({
 
   actions: {
     login: (context, payload) => {
+      //display loaders on buttons
+      if (payload.username === "demoplayer@salvo") {
+        context.commit("setLoadingDemo", true)
+      } else { context.commit("setLoadingLogin", true) }
+
+      //build JSON for posting to backend
       var credentials = {
         username: payload.username,
         password: payload.password
@@ -89,6 +110,7 @@ export default new Vuex.Store({
         return body.join("&");
       }
 
+      //posting to backend
       fetch(proxi + "/api/login", {
         credentials: 'include',
         headers: {
@@ -106,8 +128,10 @@ export default new Vuex.Store({
           context.dispatch("fetchActiveUserContent");
           router.push("/game_list");
         })
-        .catch(function (error) {
-          context.commit("alertPopupOn", { type: "error", message: error })
+        .catch(() => {
+          context.commit("setLoadingDemo", false);
+          context.commit("setLoadingLogin", false);
+          context.commit("alertPopupOn", { type: "error", message: "Please check username and password" })
           setTimeout(() => {
             context.commit("alertPopupOff");
           }, 6000);
@@ -172,11 +196,8 @@ export default new Vuex.Store({
           }
         })
         .catch(error => {
-          alert("error in creating user", error);
+          alert("Could not create new user", error);
         })
     }
-  },
-
-  modules: {
   }
 })

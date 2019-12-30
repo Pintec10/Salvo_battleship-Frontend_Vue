@@ -32,7 +32,6 @@
             :color="alertPopup.type"
             dark
             :type="alertPopup.type"
-            prominent
             dense
             dismissible
             transition="scale"
@@ -40,27 +39,36 @@
         </div>
         <div class="my-3">
           <v-btn
+            :loading="loadingLogin"
             class="mx-2 white--text"
             color="green"
             ripple
             :disabled="enteredValue.username === '' || enteredValue.password === ''"
-            @click="login(enteredValue)"
+            @click="login(enteredValue), loadingLogin = true"
           >Login</v-btn>
           <v-btn
+            :loading="loadingRegister"
             class="mx-2 white--text"
             color="blue"
             ripple
             :disabled="enteredValue.username === '' || enteredValue.password === ''"
-            @click="createUser(enteredValue)"
+            @click="createUser(enteredValue), loadingRegister = true"
           >Register</v-btn>
         </div>
         <div class="my-3">
-          <v-btn
-            class="mx-2 white--text"
-            color="blue-grey"
-            ripple
-            @click="login(demoCredentials)"
-          >Login as demo player</v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-on="on"
+                :loading="loadingDemo"
+                class="mx-2 white--text"
+                color="blue-grey"
+                ripple
+                @click="login(demoCredentials), loadingDemo = true"
+              >Login as demo player</v-btn>
+            </template>
+            <span>Log in with a mock account: allows you to check features available to registered users</span>
+          </v-tooltip>
         </div>
       </v-card>
     </v-container>
@@ -90,7 +98,13 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["loggedUser", "alertPopup"])
+    ...mapGetters([
+      "loggedUser",
+      "alertPopup",
+      "loadingLogin",
+      "loadingDemo",
+      "loadingRegister"
+    ])
   }
 };
 </script>
