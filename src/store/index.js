@@ -126,6 +126,8 @@ export default new Vuex.Store({
         })
         .then(() => {
           context.dispatch("fetchActiveUserContent");
+          context.commit("setLoadingDemo", false);
+          context.commit("setLoadingLogin", false);
           router.push("/game_list");
         })
         .catch(() => {
@@ -170,6 +172,7 @@ export default new Vuex.Store({
     },
 
     createUser(context, payload) {
+      context.commit("setLoadingRegister", true);
       fetch(proxi + "/api/players", {
         credentials: 'include',
         method: "POST",
@@ -177,6 +180,7 @@ export default new Vuex.Store({
         body: JSON.stringify({ userName: payload.username, password: payload.password })
       })
         .then(response => {
+          context.commit("setLoadingRegister", false);
           if ((response.status >= 200 && response.status < 300) || response.status === 403) {
             return Promise.resolve(response.json());
           } else { return Promise.reject(new Error(response.statusText)) }
