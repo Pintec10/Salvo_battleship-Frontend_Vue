@@ -60,8 +60,8 @@
           <div class="d-flex flex-column justify-center align-center">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-btn small fab color="blue-grey lighten-4" class="my-2" v-on="on" :ripple="false">
-                  <v-icon dark small :color="stateInfo.color" v-on="on">{{stateInfo.icon}}</v-icon>
+                <v-btn small fab :color="stateInfo.color" class="my-2" v-on="on" :ripple="false">
+                  <v-icon dark small color="white" v-on="on">{{stateInfo.icon}}</v-icon>
                 </v-btn>
               </template>
               <span>{{stateInfo.message}}</span>
@@ -69,8 +69,14 @@
 
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-btn fab dark color="blue" class="my-2" @click="overlay = !overlay">
-                  <v-icon large>mdi-information-variant</v-icon>
+                <v-btn
+                  fab
+                  dark
+                  color="blue-grey lighten-4"
+                  class="my-2"
+                  @click="overlay = !overlay"
+                >
+                  <v-icon large color="indigo">mdi-information-variant</v-icon>
                 </v-btn>
 
                 <v-overlay :value="overlay" opacity="0.8">
@@ -456,7 +462,7 @@ export default {
 
     stateInfo() {
       let output = {};
-      output.color = "blue";
+      output.color = "amber";
       output.icon = "mdi-timer-sand";
       output.message = "Waiting for your opponent...";
       if (this.gamedata.gameOver) {
@@ -475,10 +481,12 @@ export default {
         }
       } else if (this.placingShips) {
         output.icon = "mdi-ferry";
+        output.color = "indigo";
         output.message =
           "Arrange your ships by dragging and rotating them, then push 'Ready to go!'";
       } else if (this.firingSalvoes) {
         output.icon = "mdi-crosshairs-gps";
+        output.color = "green";
         output.message =
           "Click on the opponent's grid to place your shots, then push 'Fire!'";
       }

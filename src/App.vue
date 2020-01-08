@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <Sounds />
     <HeaderNav />
     <v-content>
       <router-view class="empty-top-for-spacer" />
@@ -9,11 +10,13 @@
 
 <script>
 import HeaderNav from "./components/HeaderNav.vue";
+import Sounds from "./components/Sounds.vue";
 
 export default {
   name: "App",
   components: {
-    HeaderNav
+    HeaderNav,
+    Sounds
   },
   data: () => ({})
 };

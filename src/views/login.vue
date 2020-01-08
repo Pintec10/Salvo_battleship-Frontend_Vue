@@ -68,6 +68,7 @@
               >Login as demo player</v-btn>
             </template>
             <span>Log in with a mock account: allows you to check features available to registered users</span>
+            <p>Please allow some time for the Heroku server to start, might take several seconds!</p>
           </v-tooltip>
         </div>
       </v-card>
