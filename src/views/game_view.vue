@@ -60,8 +60,8 @@
           <div class="d-flex flex-column justify-center align-center">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-btn small fab color="blue-grey lighten-4" class="my-2" v-on="on" ripple="false">
-                  <v-icon dark small :color="stateInfo.color" v-on="on">{{stateInfo.icon}}</v-icon>
+                <v-btn small fab :color="stateInfo.color" class="my-2" v-on="on" :ripple="false">
+                  <v-icon dark small color="white" v-on="on">{{stateInfo.icon}}</v-icon>
                 </v-btn>
               </template>
               <span>{{stateInfo.message}}</span>
@@ -69,8 +69,14 @@
 
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-btn fab dark color="blue" class="my-2" @click="overlay = !overlay">
-                  <v-icon large>mdi-information-variant</v-icon>
+                <v-btn
+                  fab
+                  dark
+                  color="blue-grey lighten-4"
+                  class="my-2"
+                  @click="overlay = !overlay"
+                >
+                  <v-icon large color="indigo">mdi-information-variant</v-icon>
                 </v-btn>
 
                 <v-overlay :value="overlay" opacity="0.8">
@@ -79,24 +85,38 @@
                       <v-icon>mdi-close</v-icon>
                     </v-btn>
                     <p>
-                      Start arranging your boats by dragging them on your game grid. You can rotate a ship by
-                      pushing the rotation button on its upper left corner.
-                      You must wait for your opponent to place their ships too before you can start firing salvoes.
+                      Arrange your boats by dragging them on your game grid. You can rotate a ship by
+                      pushing the
+                      <v-btn
+                        fab
+                        dark
+                        color="deep-orange accent-3"
+                        height="4vmin"
+                        width="4vmin"
+                        class="rotate-button mx-1"
+                      >
+                        <v-icon class="rotate-icon" size="3vmin">mdi-rotate-3d-variant</v-icon>
+                      </v-btn>rotation button. You must wait for your opponent to place their ships too before you can start firing salvoes.
                     </p>
                     <p>
                       You can fire a salvo of
-                      <span class="font-weight-bold">5 shots</span> each turn. You select/unselect a case by
-                      clicking on it on your opponent's grid.
-                      Then push the "Fire!" button: you will see immediately the result of your shots,
+                      <span class="font-weight-bold">5 shots</span> each turn. Select/unselect a case by
+                      clicking on your opponent's grid, then push the
+                      <v-btn x-small dark color="red darken-2" class="mx-1">
+                        <v-icon x-small class="mr-1">mdi-crosshairs-gps</v-icon>FIRE!
+                      </v-btn>button. You will see immediately the result of your shots (e.g.
+                      <v-chip dark x-small color="red" class="mx-1">3</v-chip>= successful hit on turn 3,
+                      <v-chip dark x-small color="grey" class="mx-1">1</v-chip>= miss on turn 1),
                       but you must wait until your opponent has done the same before you can fire another salvo.
                     </p>
                     <p>
-                      The "Fleet status" panel on the left shows the damage suffered by your boats,and if
+                      The
+                      <span class="font-weight-bold">"Fleet status"</span> panel on the left shows the damage suffered by your boats, and if
                       they have been sunken. Your opponent's Fleet Status panel only shows which ships have been sunken.
                     </p>
                     <p>
                       When all of a player's ships are sunk, the game ends and the winner gets 1 point.
-                      If both players get their ships sunken on the same round, a tie occurs and each gets 0.5 points.
+                      If both players' fleets get destroyed on the same round, a tie occurs and each gets 0.5 points.
                     </p>
                     <p>
                       <span class="font-weight-bold">TIP:</span> Hover on the small icon in the center of the screen,
@@ -153,42 +173,20 @@
                 />
               </div>
             </div>
-
-            <audio id="target">
-              <source src="../assets/sounds/bleep02.wav" />
-            </audio>
-            <audio id="cancel">
-              <source src="../assets/sounds/cancel02.wav" />
-            </audio>
-            <audio id="launch">
-              <source src="../assets/sounds/launch04.wav" />
-            </audio>
           </div>
         </div>
 
         <!-- BOTTOM SHEET TO SHOW THAT GAME IS OVER -->
         <div class="text-center">
-          <v-bottom-sheet v-model="bottomSheet" :activator="gamedata.gameOver">
-            <v-sheet class="text-center" height="200px">
-              <v-icon
-                dark
-                x-large
-                :color="stateInfo.color"
-                class="my-3"
-                v-on="on"
-              >{{stateInfo.icon}}</v-icon>
+          <v-bottom-sheet v-model="bottomSheet">
+            <v-sheet class="text-center" height="200px" color="hsla(0, 50%, 0%, 0.7)">
+              <v-icon dark x-large :color="stateInfo.color" class="my-4">{{stateInfo.icon}}</v-icon>
+
               <div class="my-3">{{stateInfo.message}}</div>
               <v-btn class="mt-6" dark color="red" @click="sheet = !sheet">close</v-btn>
             </v-sheet>
           </v-bottom-sheet>
         </div>
-
-        <!-- dragdroptest -->
-        <!-- <div class="my-3">
-      <p>dragdrop area</p>
-      <drag id="dragbox" class="dragtest ma-1 pa-3" :transfer-data="test" drop-effect="move"></drag>
-      <drop class="dragtest-2 ma-1 pa-1" @drop="handleDrop"></drop>
-        </div>-->
       </v-container>
     </div>
   </div>
@@ -198,6 +196,7 @@
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
 import Fleet from "@/components/Fleet.vue";
+const proxi = "https://infinite-shore-25867.herokuapp.com";
 
 export default {
   name: "game_view",
@@ -241,7 +240,7 @@ export default {
         }
       ],
       defaultStatusReport: {
-        gamePlayer: 27,
+        gamePlayer: 0,
         hitsReceived: null,
         missReceived: null,
         fleetStatus: []
@@ -308,12 +307,15 @@ export default {
 
     postPlacedShips(shipList) {
       let responseState = "";
-      fetch("/api/games/players/" + this.$route.params.gpId + "/ships", {
-        credentials: "include",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(shipList)
-      })
+      fetch(
+        proxi + "/api/games/players/" + this.$route.params.gpId + "/ships",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(shipList)
+        }
+      )
         .then(response => {
           if (response.status >= 300) {
             responseState = "error";
@@ -342,8 +344,9 @@ export default {
     },
 
     getGameData() {
-      console.log("calling getgamedata");
-      fetch("/api/game_view/" + this.$route.params.gpId)
+      fetch(proxi + "/api/game_view/" + this.$route.params.gpId, {
+        credentials: "include"
+      })
         .then(response => response.json())
         .then(json => {
           this.updatingFleet = true;
@@ -364,16 +367,19 @@ export default {
     },
 
     postPlacedSalvoes(targetLocationsList) {
-      //document.getElementById("launch").play();
+      document.getElementById("launch").play();
       let responseState = "";
       let salvo = {};
       salvo.locations = targetLocationsList;
-      fetch("/api/games/players/" + this.$route.params.gpId + "/salvoes", {
-        credentials: "include",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(salvo)
-      })
+      fetch(
+        proxi + "/api/games/players/" + this.$route.params.gpId + "/salvoes",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(salvo)
+        }
+      )
         .then(response => {
           if (response.status >= 300) {
             responseState = "error";
@@ -384,7 +390,6 @@ export default {
           if (responseState === "error") {
             return Promise.reject(new Error(respMessage));
           } else {
-            //document.getElementById("launch").play();
             this.loaded = false;
             this.firingSalvoes = false;
             this.updateSalvoPlacementList("reset");
@@ -411,7 +416,6 @@ export default {
           (isViewersFleet && oneReport.gamePlayer == viewersId) ||
           (!isViewersFleet && oneReport.gamePlayer != viewersId)
         ) {
-          //selectedReport = Object.assign({}, oneReport);
           selectedReport = { ...oneReport };
         }
       });
@@ -458,7 +462,7 @@ export default {
 
     stateInfo() {
       let output = {};
-      output.color = "blue";
+      output.color = "amber";
       output.icon = "mdi-timer-sand";
       output.message = "Waiting for your opponent...";
       if (this.gamedata.gameOver) {
@@ -477,10 +481,12 @@ export default {
         }
       } else if (this.placingShips) {
         output.icon = "mdi-ferry";
+        output.color = "indigo";
         output.message =
           "Arrange your ships by dragging and rotating them, then push 'Ready to go!'";
       } else if (this.firingSalvoes) {
         output.icon = "mdi-crosshairs-gps";
+        output.color = "green";
         output.message =
           "Click on the opponent's grid to place your shots, then push 'Fire!'";
       }
@@ -497,15 +503,19 @@ export default {
     this.getGameData();
     this.updateShipPlacementList([]);
     this.updateSalvoPlacementList("reset");
+
     this.dataUpdater = setInterval(() => {
-      console.log("updating");
       if (!this.placingShips) {
         this.getGameData();
       }
       if (this.gamedata.gameOver) {
         clearInterval(this.dataUpdater);
       }
-    }, 5000);
+    }, 8000);
+  },
+
+  beforeDestroy() {
+    clearInterval(this.dataUpdater);
   }
 };
 </script>
@@ -526,7 +536,6 @@ export default {
 .game-view-container {
   background-color: hsla(0, 50%, 0%, 0.7);
   height: 100%;
-  /* width: 100vw; */
 }
 
 .test {

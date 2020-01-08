@@ -12,7 +12,6 @@
       </div>
       <div v-for="(column, j) in columns" :key="j" class="gridcolumn">
         <!-- ACTUAL GAME CELL DOWN HERE -->
-
         <Drop
           @drop="handleDrop({row: row, col: column}, ...arguments)"
           class="gridcell cellborder d-flex align-center water"
@@ -47,7 +46,6 @@
                 <v-img
                   :src="getImageUrl(c, cellContent(i,j).shipLength, cellContent(i,j).isHorizontal)"
                 />
-                <!-- check why is image not displaying or displays only on first drag!! -->
               </div>
             </div>
 
@@ -63,14 +61,9 @@
             >
               <v-icon class="rotate-icon" size="3vmin">mdi-rotate-3d-variant</v-icon>
             </v-btn>
-
-            <!-- <div slot="image" class="shipwrapper" :class="{'flex-column': !ship.horizontal }">
-                  <div v-for="(cell, c) in draggedShip.size" :key="c" class="gridcell">
-                    <v-img src="../assets/ship-hor-start.png" />
-                  </div>
-            </div>-->
           </Drag>
 
+          <!--chip showing previously fired shot-->
           <v-chip
             v-if="getSalvoTurn(i, j, firingGamePlayerID) !== 0"
             dark
@@ -78,6 +71,7 @@
             class="absolute on-top darken-2"
             :class="{'red': isAHit(cellname(i,j))}"
           >{{getSalvoTurn(i, j, firingGamePlayerID)}}</v-chip>
+
           <!--clickable div to submit a shot-->
           <div
             v-else-if="firingSalvoes && !gamedata.gameOver"
@@ -251,8 +245,6 @@ export default {
 
       //if all ok, adding the ship to the list and dropping it down
       if (conflict === false) {
-        console.log("checks passed, pushing and appending");
-
         //removing same ship from array if already present
         shipArray.forEach((oneExistingShip, index) => {
           if (oneExistingShip.type === newShip.type) {
@@ -263,7 +255,6 @@ export default {
         shipArray.push(newShip);
         this.updateShipPlacementList(shipArray);
       } else {
-        console.log("checks not passed!");
         this.alertPopupOn({ type: "error", message: errorMessage });
         setTimeout(() => {
           this.alertPopupOff();
@@ -348,29 +339,28 @@ export default {
 
 .cellborder {
   box-shadow: 0px 0px 1.5px 0.5px hsla(0, 50%, 100%, 0.6) inset;
-  /*outline: 1px dotted white;*/
 }
 
 /* GLOWING BORDER AROUND GRID  */
 
 .grid .gridrow .gridcolumn:nth-child(2) .cellborder {
-  border-left: 3px outset white;
+  border-left: 5px outset white;
 }
 .grid .gridrow .gridcolumn:last-child .cellborder {
-  border-right: 3px outset white;
+  border-right: 5px outset white;
 }
 .grid .gridrow:nth-child(2) .cellborder {
-  border-top: 3px outset white;
+  border-top: 5px outset white;
 }
 .grid .gridrow:last-child .cellborder {
-  border-bottom: 3px outset white;
+  border-bottom: 5px outset white;
 }
 .glowing .gridrow .gridcolumn:nth-child(2) .cellborder,
 .glowing .gridrow .gridcolumn:last-child .cellborder,
 .glowing .gridrow:nth-child(2) .cellborder,
 .glowing .gridrow:last-child .cellborder {
   animation-name: gridglow;
-  animation-duration: 4s;
+  animation-duration: 3s;
   animation-iteration-count: infinite;
 }
 
@@ -379,7 +369,7 @@ export default {
     border-color: white;
   }
   50% {
-    border-color: rgb(250, 152, 41);
+    border-color: rgb(187, 115, 33);
   }
   100% {
     border-color: white;
@@ -387,10 +377,7 @@ export default {
 }
 
 .water {
-  background-image: url("../assets/water.jpg");
   background-image: url("../assets/giphy_water_1.gif");
-  /* background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif"); */
-  /*background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
 
 .shipwrapper {
@@ -424,8 +411,4 @@ export default {
 .targeted {
   box-shadow: 0px 0px 4vmin 0px rgba(221, 16, 16, 0.8) inset;
 }
-
-/*.highlightable :hover {
-  border: 1px solid gold;
-}*/
 </style>

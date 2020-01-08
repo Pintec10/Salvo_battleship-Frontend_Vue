@@ -23,7 +23,7 @@
             >
               <v-icon>mdi-ferry</v-icon>
             </v-btn>
-            <p>Dashboard</p>
+            <p>Games</p>
           </div>
           <div class="d-flex flex-column justify-center align-center mx-5">
             <v-btn
@@ -41,6 +41,7 @@
           </div>
           <div class="d-flex flex-column justify-center align-center mx-5">
             <v-btn
+              v-if="!logged"
               x-large
               color="indigo lighten-4"
               light
@@ -51,20 +52,22 @@
             >
               <v-icon>mdi-account-key</v-icon>
             </v-btn>
-            <p>Login</p>
-          </div>
-          <!-- <div class="d-flex flex-column">
-            <v-btn to="/leaderboard" icon v-on="on">
-              <v-icon>mdi-trophy</v-icon>
-              <p>Leaderboard</p>
+
+            <v-btn
+              v-else
+              x-large
+              color="indigo lighten-4"
+              light
+              class="mx-1 my-2"
+              to="/logout"
+              fab
+              v-on="on"
+            >
+              <v-icon>mdi-exit-run</v-icon>
             </v-btn>
+            <p v-if="!logged">Login</p>
+            <p v-else>Logout</p>
           </div>
-          <div class="d-flex flex-column">
-            <v-btn class="mx-1" to="/login" icon v-on="on" v-show="!logged">
-              <v-icon>mdi-account-key</v-icon>
-            </v-btn>
-            <p>Login</p>
-          </div>-->
         </div>
       </v-card>
     </div>>
@@ -72,12 +75,15 @@
 </template>
 
 <script>
-// @ is an alias to /src
+import { mapGetters } from "vuex";
 
 export default {
   name: "home",
   components: {},
-  methods: {}
+  methods: {},
+  computed: {
+    ...mapGetters(["logged"])
+  }
 };
 </script>
 
@@ -89,8 +95,5 @@ export default {
   background-attachment: fixed;
   height: 100%;
 }
-
-.test {
-  border: 1px solid red;
-}
 </style>
+ 

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '@/router'
-
+const proxi = "https://infinite-shore-25867.herokuapp.com"
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -11,6 +11,9 @@ export default new Vuex.Store({
       id: null,
       name: null
     },
+    loadingLogin: false,
+    loadingRegister: false,
+    loadingDemo: false,
     alertPopup: {
       visible: false,
       message: ""
@@ -22,6 +25,9 @@ export default new Vuex.Store({
   getters: {
     logged: state => { return state.logged; },
     loggedUser: state => { return state.loggedUser; },
+    loadingLogin: state => { return state.loadingLogin },
+    loadingDemo: state => { return state.loadingDemo },
+    loadingRegister: state => { return state.loadingRegister },
     alertPopup: state => { return state.alertPopup },
     shipPlacementList: state => { return state.shipPlacementList },
     salvoPlacementList: state => { return state.salvoPlacementList }
@@ -30,12 +36,23 @@ export default new Vuex.Store({
   mutations: {
     login: (state, payload) => {
       state.loggedUser = payload;
-      state.logged = true;
+      if (payload.id === null) {
+        state.logged = false;
+      } else state.logged = true;
     },
     logout: (state) => {
       state.loggedUser.id = null;
       state.loggedUser.name = null;
       state.logged = false;
+    },
+    setLoadingLogin: (state, payload) => {
+      state.loadingLogin = payload;
+    },
+    setLoadingDemo: (state, payload) => {
+      state.loadingDemo = payload;
+    },
+    setLoadingRegister: (state, payload) => {
+      state.loadingRegister = payload;
     },
     alertPopupOn: (state, payload) => {
       state.alertPopup.visible = true;
@@ -72,6 +89,12 @@ export default new Vuex.Store({
 
   actions: {
     login: (context, payload) => {
+      //display loaders on buttons
+      if (payload.username === "demoplayer@salvo") {
+        context.commit("setLoadingDemo", true)
+      } else { context.commit("setLoadingLogin", true) }
+
+      //build JSON for posting to backend
       var credentials = {
         username: payload.username,
         password: payload.password
@@ -87,7 +110,8 @@ export default new Vuex.Store({
         return body.join("&");
       }
 
-      fetch("/api/login", {
+      //posting to backend
+      fetch(proxi + "/api/login", {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -102,10 +126,14 @@ export default new Vuex.Store({
         })
         .then(() => {
           context.dispatch("fetchActiveUserContent");
+          context.commit("setLoadingDemo", false);
+          context.commit("setLoadingLogin", false);
           router.push("/game_list");
         })
-        .catch(function (error) {
-          context.commit("alertPopupOn", { type: "error", message: error })
+        .catch(() => {
+          context.commit("setLoadingDemo", false);
+          context.commit("setLoadingLogin", false);
+          context.commit("alertPopupOn", { type: "error", message: "Please check username and password" })
           setTimeout(() => {
             context.commit("alertPopupOff");
           }, 6000);
@@ -113,7 +141,9 @@ export default new Vuex.Store({
     },
 
     fetchActiveUserContent(context) {
-      fetch("/api/games")
+      fetch(proxi + "/api/games", {
+        credentials: 'include',
+      })
         .then(response => {
           if (response.status >= 200 && response.status < 300) {
             return Promise.resolve(response)
@@ -121,6 +151,8 @@ export default new Vuex.Store({
         })
         .then(response => response.json())
         .then(json => {
+
+
           context.commit("login", json.current_user);
         })
         .catch(error => {
@@ -132,7 +164,7 @@ export default new Vuex.Store({
     },
 
     logout(context) {
-      fetch("/api/logout", { method: "POST" })
+      fetch(proxi + "/api/logout", { method: "POST", credentials: 'include' })
         .then(() => {
           context.commit("logout");
           router.push("/login");
@@ -140,13 +172,15 @@ export default new Vuex.Store({
     },
 
     createUser(context, payload) {
-      fetch("/api/players", {
+      context.commit("setLoadingRegister", true);
+      fetch(proxi + "/api/players", {
         credentials: 'include',
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userName: payload.username, password: payload.password })
       })
         .then(response => {
+          context.commit("setLoadingRegister", false);
           if ((response.status >= 200 && response.status < 300) || response.status === 403) {
             return Promise.resolve(response.json());
           } else { return Promise.reject(new Error(response.statusText)) }
@@ -166,11 +200,8 @@ export default new Vuex.Store({
           }
         })
         .catch(error => {
-          alert("error in creating user", error);
+          alert("Could not create new user", error);
         })
     }
-  },
-
-  modules: {
   }
 })

@@ -1,8 +1,9 @@
 <template>
   <div class="background">
     <v-container>
-      <h1 class="text-center my-3 black--text">Leaderboard</h1>
-      <div v-if="loaded === true">
+      <h1 class="text-center my-3 ">Leaderboard</h1>
+
+      <div>
         <v-data-table
           class="table-main"
           :headers="headers"
@@ -27,6 +28,8 @@
 </template>
 
 <script>
+const proxi = "https://infinite-shore-25867.herokuapp.com";
+
 export default {
   name: "leaderboard",
 
@@ -110,7 +113,7 @@ export default {
   },
 
   created() {
-    fetch("/api/games")
+    fetch(proxi + "/api/games", { credentials: "include" })
       .then(response => response.json())
       .then(json => {
         this.sourcedata = json;
@@ -139,13 +142,13 @@ export default {
 
 <style scoped>
 .background {
-  background-image: url("../assets/background_03.jpg");
+  background-image: url("../assets/medal_02.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   height: 100%;
 }
 .table-main {
-  background-color: hsla(0, 50%, 0%, 0.8);
+  background-color: hsla(0, 50%, 0%, 0.8) !important;
 }
 </style>

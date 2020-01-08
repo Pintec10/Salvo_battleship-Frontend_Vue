@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app>
+  <v-app-bar fixed color="rgba(0, 0, 0, 0.8)">
     <v-toolbar-title class="headline text-uppercase">
       <span>SALVO!</span>
     </v-toolbar-title>
@@ -25,10 +25,6 @@
         </template>
         <span>Games</span>
       </v-tooltip>
-
-      <!--<v-btn class="mx-1" to="/game_view/1" icon :disabled="!logged">
-        <v-icon>mdi-ferry</v-icon>
-      </v-btn>-->
 
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
@@ -65,16 +61,18 @@ import { mapActions } from "vuex";
 export default {
   name: "HeaderNav",
   data() {
-    return {
-      //data here
-    };
+    return {};
   },
   methods: {
-    ...mapActions(["logout"])
+    ...mapActions(["logout", "fetchActiveUserContent"])
   },
 
   computed: {
     ...mapGetters(["loggedUser", "logged"])
+  },
+
+  created() {
+    this.fetchActiveUserContent();
   }
 };
 </script>

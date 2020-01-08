@@ -38,8 +38,6 @@
             <v-img src="../assets/smoke_15.gif"></v-img>
           </div>
         </div>
-
-        <!-- </div> -->
       </div>
     </div>
   </div>
@@ -59,10 +57,7 @@ export default {
     },
     updatingFleet: {
       type: Boolean
-    } /*
-    battleStatus: {
-      type: Array
-    },*/,
+    },
     fleetStatus: {
       type: Array
     }
@@ -92,8 +87,6 @@ export default {
     },
 
     organizeFleet(fleet) {
-      //REMOVE IF NOT USED
-      console.log("trying to organize ships");
       fleet.sort(function(ship1, ship2) {
         if (ship1.maxHP === ship2.maxHP) {
           if (ship1.type === "Destroyer") {
@@ -145,10 +138,7 @@ export default {
 }
 
 .water {
-  background-image: url("../assets/water.jpg");
   background-image: url("../assets/giphy_water_1.gif");
-  /* background-image: url("https://media.giphy.com/media/SHUu78CIqq4FO/giphy.gif"); */
-  /*background-image: url("https://media.giphy.com/media/hqaaJowDvwv60/giphy.gif");*/
 }
 
 .test2 {
