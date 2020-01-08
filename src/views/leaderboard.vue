@@ -1,7 +1,7 @@
 <template>
   <div class="background">
     <v-container>
-      <h1 class="text-center my-3 ">Leaderboard</h1>
+      <h1 class="text-center my-3">Leaderboard</h1>
 
       <div>
         <v-data-table
@@ -28,7 +28,8 @@
 </template>
 
 <script>
-const proxi = "https://infinite-shore-25867.herokuapp.com";
+//const proxi = "https://infinite-shore-25867.herokuapp.com";
+const proxi = "";
 
 export default {
   name: "leaderboard",

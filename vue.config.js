@@ -3,8 +3,8 @@ module.exports = {
     "vuetify"
   ],
   // UNCOMMENT devServer TO WORK IN LOCAL
-  //devServer: {
-  //  proxy: "http://localhost:8080"
-  //}
+  devServer: {
+    proxy: "http://localhost:8080"
+  }
 
 }
