@@ -196,6 +196,8 @@
 import GameGrid from "@/components/GameGrid.vue";
 import { mapGetters, mapMutations } from "vuex";
 import Fleet from "@/components/Fleet.vue";
+import SockJS from "sockjs-client";
+import Stomp from "webstomp-client";
 //const proxi = "https://infinite-shore-25867.herokuapp.com"; //RESTORE FOR LIVE BUILD
 const proxi = "";
 
@@ -209,7 +211,7 @@ export default {
   data() {
     return {
       loaded: false,
-      dataUpdater: null,
+      connected: false,
       gamedata: {},
       rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       columns: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -333,6 +335,9 @@ export default {
             this.getGameData();
           }
         })
+        .then(() => {
+          this.sendWebsocketMessage();
+        })
         .catch(error => {
           this.alertPopupOn({
             type: "error",
@@ -345,6 +350,7 @@ export default {
     },
 
     getGameData() {
+      console.log("getting new gamedata");
       fetch(proxi + "/api/game_view/" + this.$route.params.gpId, {
         credentials: "include"
       })
@@ -364,6 +370,14 @@ export default {
           }
           this.shipSort();
           this.loaded = true;
+        })
+        .then(() => {
+          if (!this.connected) {
+            console.log("connecting to websocket");
+            this.connectToWebsocket();
+          } else {
+            console.log("already connected to websocket");
+          }
         });
     },
 
@@ -396,6 +410,9 @@ export default {
             this.updateSalvoPlacementList("reset");
             this.getGameData();
           }
+        })
+        .then(() => {
+          this.sendWebsocketMessage();
         })
         .catch(error => {
           this.alertPopupOn({
@@ -455,6 +472,47 @@ export default {
             oneSalvo.gamePlayer == this.$route.params.gpId
         );
       }
+    },
+
+    connectToWebsocket() {
+      this.socket = new SockJS("http://localhost:8080/salvo-websocket"); //can I remove localhost and place proxi?
+      this.stompClient = Stomp.over(this.socket);
+      this.stompClient.connect(
+        {},
+        frame => {
+          this.connected = true;
+          console.log("Frame:");
+          console.log(frame);
+
+          // actions to perform when receiving message from backend
+          this.stompClient.subscribe("/topic/" + this.gamedata.id, tick => {
+            console.log("tick received:");
+            console.log(tick);
+            console.log("I'll get new data now!");
+            this.getGameData();
+          });
+        },
+        error => {
+          console.log("tick error!");
+          console.log(error);
+          this.connected = false;
+        }
+      );
+    },
+
+    disconnectFromWebsocket() {
+      if (this.stompClient) {
+        this.stompClient.disconnect();
+      }
+      this.connected = false;
+    },
+
+    sendWebsocketMessage() {
+      if (this.stompClient && this.stompClient.connected) {
+        console.log("Sending message to backend");
+
+        this.stompClient.send("/comms/" + this.gamedata.id, "", {});
+      }
     }
   },
 
@@ -504,19 +562,10 @@ export default {
     this.getGameData();
     this.updateShipPlacementList([]);
     this.updateSalvoPlacementList("reset");
-
-    this.dataUpdater = setInterval(() => {
-      if (!this.placingShips) {
-        this.getGameData();
-      }
-      if (this.gamedata.gameOver) {
-        clearInterval(this.dataUpdater);
-      }
-    }, 8000);
   },
 
   beforeDestroy() {
-    clearInterval(this.dataUpdater);
+    this.disconnectFromWebsocket();
   }
 };
 </script>
