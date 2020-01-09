@@ -28,8 +28,8 @@
 </template>
 
 <script>
-//const proxi = "https://infinite-shore-25867.herokuapp.com";
-const proxi = "";
+const proxi = "https://infinite-shore-25867.herokuapp.com"; //COMMENT FOR LOCAL BUILD
+//const proxi = ""; //RESTORE FOR LOCAL BUILD
 
 export default {
   name: "leaderboard",

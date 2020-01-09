@@ -198,8 +198,8 @@ import { mapGetters, mapMutations } from "vuex";
 import Fleet from "@/components/Fleet.vue";
 import SockJS from "sockjs-client";
 import Stomp from "webstomp-client";
-//const proxi = "https://infinite-shore-25867.herokuapp.com"; //RESTORE FOR LIVE BUILD
-const proxi = "";
+const proxi = "https://infinite-shore-25867.herokuapp.com"; // COMMENT FOR LOCAL BUILD
+//const proxi = "http://localhost:8080"; // FOR LOCAL BUILD
 
 export default {
   name: "game_view",
@@ -350,7 +350,6 @@ export default {
     },
 
     getGameData() {
-      console.log("getting new gamedata");
       fetch(proxi + "/api/game_view/" + this.$route.params.gpId, {
         credentials: "include"
       })
@@ -373,10 +372,10 @@ export default {
         })
         .then(() => {
           if (!this.connected) {
-            console.log("connecting to websocket");
+            //console.log("connecting to websocket");
             this.connectToWebsocket();
           } else {
-            console.log("already connected to websocket");
+            //console.log("already connected to websocket");
           }
         });
     },
@@ -475,26 +474,29 @@ export default {
     },
 
     connectToWebsocket() {
-      this.socket = new SockJS("http://localhost:8080/salvo-websocket"); //can I remove localhost and place proxi?
+      this.socket = new SockJS(proxi + "/salvo-websocket");
       this.stompClient = Stomp.over(this.socket);
       this.stompClient.connect(
         {},
-        frame => {
+        //frame => {
+        () => {
           this.connected = true;
-          console.log("Frame:");
-          console.log(frame);
+          //console.log("Frame:");
+          //console.log(frame);
 
           // actions to perform when receiving message from backend
-          this.stompClient.subscribe("/topic/" + this.gamedata.id, tick => {
-            console.log("tick received:");
-            console.log(tick);
-            console.log("I'll get new data now!");
+          //this.stompClient.subscribe("/topic/" + this.gamedata.id, tick => {
+          this.stompClient.subscribe("/topic/" + this.gamedata.id, () => {
+            //console.log("tick received:");
+            //console.log(tick);
+            //console.log("I'll get new data now!");
             this.getGameData();
           });
         },
         error => {
-          console.log("tick error!");
-          console.log(error);
+          //console.log("tick error!");
+          //console.log(error);
+          alert(error);
           this.connected = false;
         }
       );
@@ -509,8 +511,6 @@ export default {
 
     sendWebsocketMessage() {
       if (this.stompClient && this.stompClient.connected) {
-        console.log("Sending message to backend");
-
         this.stompClient.send("/comms/" + this.gamedata.id, "", {});
       }
     }
