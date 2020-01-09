@@ -78,24 +78,6 @@ export default {
     };
   },
 
-  //these methods are for testing websocket
-  methods: {
-    processOpen(message) {
-      console.log("opening connection with server");
-      this.testSocketText += "Opening connection on message: " + message + "\n";
-    },
-
-    processClose(message) {
-      this.testSocketText += "Closing connection on message: " + message + "\n";
-      console.log("closing connection with server");
-      this.websocket.send("client disonnected"); // had to add a "this" here... correct?
-    },
-
-    processError(message) {
-      console.log("there was an error");
-      this.testSocketText += "An error occurred: " + message + "\n";
-    },
-
     processMessage(message) {
       this.testSocketText +=
         "Receive this message from server: " + message + "\n";
