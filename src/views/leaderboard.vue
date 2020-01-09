@@ -69,30 +69,8 @@ export default {
           value: "total_score",
           align: "center"
         }
-      ],
-
-      //for socket testing
-      websocket: null,
-      testSocketText: "",
-      testInputText: ""
+      ]
     };
-  },
-
-    processMessage(message) {
-      this.testSocketText +=
-        "Receive this message from server: " + message + "\n";
-    },
-
-    sendMessage(inputMessage) {
-      this.websocket.send(inputMessage);
-      if (inputMessage !== "close") {
-        this.testSocketText +=
-          "Sent this message to server: " + inputMessage + "\n";
-        this.testInputText = "";
-      } else {
-        this.websocket.close();
-      }
-    }
   },
 
   created() {
@@ -102,23 +80,6 @@ export default {
         this.sourcedata = json;
         this.loaded = true;
       });
-
-    //here testing socket initialization with created; check URL @ 8:50 in YT
-    // also check if necessary to change arrow function
-    this.websocket = new WebSocket("ws://localhost:8080/salvo/serverEndpoint");
-    //this.websocket = new WebSocket("ws://localhost:8080/salvo/serverEndpoint");
-    this.websocket.onopen = message => {
-      this.processOpen(message);
-    };
-    this.websocket.onclose = message => {
-      this.processClose(message);
-    };
-    this.websocket.onError = () => {
-      this.processError();
-    };
-    this.websocket.onmessage = message => {
-      this.processMessage(message);
-    };
   }
 };
 </script>
