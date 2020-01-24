@@ -13,16 +13,7 @@
           :sort-desc="true"
         ></v-data-table>
       </div>
-
-      <!-- here testing socket -->
-      <div>
-        <h3>here to show communication with server...</h3>
-        <p>{{testSocketText}}</p>
-      </div>
-      <div class="my-2">
-        <v-text-field v-model="testInputText"></v-text-field>
-        <v-btn @click="sendMessage(testInputText)">SEND MESSAGE</v-btn>
-      </div>
+      
     </v-container>
   </div>
 </template>
