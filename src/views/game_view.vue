@@ -474,28 +474,22 @@ export default {
     },
 
     connectToWebsocket() {
-      this.socket = new SockJS(proxi + "/salvo-websocket");
+      this.socket = new SockJS(proxi + "/salvo-websocket"); //handshake endpoint
       this.stompClient = Stomp.over(this.socket);
       this.stompClient.connect(
         {},
-        //frame => {
+        // note: here below, () could be (frame) but we are not using it and Vue would complain
         () => {
           this.connected = true;
-          //console.log("Frame:");
-          //console.log(frame);
 
           // actions to perform when receiving message from backend
-          //this.stompClient.subscribe("/topic/" + this.gamedata.id, tick => {
+            // note: in the arrow function, () normally is (tick), i.e. received message
+            // but here we do not use the tick content at all, so Vue would complain        
           this.stompClient.subscribe("/topic/" + this.gamedata.id, () => {
-            //console.log("tick received:");
-            //console.log(tick);
-            //console.log("I'll get new data now!");
             this.getGameData();
           });
         },
         error => {
-          //console.log("tick error!");
-          //console.log(error);
           alert(error);
           this.connected = false;
         }
